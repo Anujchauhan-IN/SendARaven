@@ -101,14 +101,14 @@ Every phase must:
 
 **Current status: Partial**
 
-**Purpose:** Develop and validate the distinctive medieval material direction without unnecessarily blocking unrelated engineering. Visual work is a parallel workstream: provisional assets may support implementation, but affected production interfaces are not final until reviewed and approved.
+**Purpose:** Develop and validate the distinctive medieval material direction without unnecessarily blocking unrelated engineering. Visual work is a parallel workstream: provisional assets may support implementation, but affected production interfaces are not final until reviewed and approved. `docs/experience-design.md` is the cross-screen experience contract for world-building, terminology, application-state integrity, accessibility and performance.
 
 **Dependencies:** Phase 0 baseline conventions. Unfinished artwork, textures, animations, or whole-screen approval do not block unrelated database, authentication, security, or domain engineering. A later phase depends on Phase 1 only where it genuinely requires an approved asset, interaction contract, or visual behavior.
 
 **Tasks:**
 - Produce independent, optimized, licensed parchment, wood, stone, raven, wax, envelope and map-style assets; do not crop generated collages into components.
 - Define provisional design tokens and typography with multilingual fallbacks and self-hosting/licensing plans.
-- Prototype the writing surface, rookery structure, sealed envelope, signet impression, map surface, loading/error/empty states, and navigation as one coherent material family.
+- Prototype the writing surface, rookery structure, sealed envelope, signet impression, map surface, loading/error/empty states, and navigation as one coherent material family governed by `docs/experience-design.md`.
 - Keep screen-specific dimensions, fonts, palette, animation timings and illustration choices provisional until reviewed.
 - Ensure textures remain legible at 1x/2x pixel density and under high text zoom.
 - Define per-screen asset and hydration budgets suitable for low-end Android devices.
@@ -135,7 +135,7 @@ Every phase must:
 
 **Purpose:** Complete the local interaction proof for the two most distinctive product surfaces without pretending local state is authoritative.
 
-**Dependencies:** Phase 0 interaction and accessibility conventions. Phase 1 may proceed in parallel. Approved visual assets are required only before the affected composer or rookery production interface is finalized, not before local behavior, data-contract, validation, accessibility, or test work begins.
+**Dependencies:** Phase 0 interaction and accessibility conventions and the state/interaction rules in `docs/experience-design.md`. Phase 1 may proceed in parallel. Approved visual assets are required only before the affected composer or rookery production interface is finalized, not before local behavior, data-contract, validation, accessibility, or test work begins.
 
 **Decision gates before finalization:**
 - Exact typed-character, page, stroke, point and serialized-payload limits.
@@ -226,6 +226,7 @@ Decisions may be deferred to later forward-only migrations when their tables and
 
 **Decision gates before durable implementation:**
 - Raven ID syntax, length, reserved-name and impersonation rules.
+- Human-facing public-identifier terminology: `Raven ID` remains the approved product/backend term until the product owner approves an alternative proposed in `docs/experience-design.md`; a UI-label decision must not silently alter UUID keys or identifier semantics.
 - City dataset, licence, geographic coverage, update/version strategy and geolocation-to-city lookup.
 - Signet fallback, long-inscription behavior, palette and final visual options.
 - City-change behavior for active missions must not mutate mission snapshots; any additional restrictions remain unresolved.
@@ -385,7 +386,7 @@ Decisions may be deferred to later forward-only migrations when their tables and
 
 **Current status: Not Started**
 
-**Dependencies:** Phase 4 immutable signets and Phase 7 delivered-letter reading.
+**Dependencies:** Phase 4 immutable signets, Phase 7 delivered-letter reading, and the envelope/opening state-integrity rules in `docs/experience-design.md`.
 
 **Tasks:**
 - Render each delivered item as folded parchment/envelope with the dispatch-time signet snapshot and textual sender identity.
@@ -411,7 +412,7 @@ Decisions may be deferred to later forward-only migrations when their tables and
 
 **Current status: Not Started**
 
-**Dependencies:** Phase 6 mission timestamps; Phase 1 map direction; approved geographic decisions.
+**Dependencies:** Phase 6 mission timestamps; Phase 1 map direction; approved geographic decisions; and the sender-only chart-table experience in `docs/experience-design.md`.
 
 **Decision gates:**
 - Production city/coastline dataset and licence.
@@ -444,7 +445,7 @@ Decisions may be deferred to later forward-only migrations when their tables and
 
 **Current status: Not Started**
 
-**Dependencies:** Phase 7 committed delivery and outbox behavior.
+**Dependencies:** Phase 7 committed delivery and outbox behavior and the notification/error-state language rules in `docs/experience-design.md`.
 
 **Decision gates:**
 - Push implementation/provider details.
@@ -568,6 +569,7 @@ The following remain unresolved unless `docs/product.md` is explicitly updated b
 | Decision | Blocks/finalizes |
 |---|---|
 | Raven ID syntax, length, reserved names and impersonation safeguards | Phase 4 validation and abuse controls |
+| Human public-identifier terminology replacing the conceptually incorrect UI term `Raven ID` | Phase 1 language system and Phase 4 onboarding/lookup UX; does not itself authorize a backend rename |
 | Initial raven allocation and inventory lifecycle rules | Phase 2 final rookery states; Phase 3 initial inventory schema; Phase 6 inventory creation |
 | Phantom return behavior and outbound/return travel assumptions | Phase 3 mission state/schema; Phase 6 timestamps/state transitions |
 | Same-city minimum travel duration | Phase 3 mission constraints if encoded there; Phase 6 travel calculation |

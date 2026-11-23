@@ -2,6 +2,7 @@
 **Status:** Design direction agreed; **specific visual designs and production assets not yet approved**.  
 **Existing prototype:** `reference-prototype/` is a useful interaction reference, not pixel-perfect authority.  
 **Design goal:** A tactile, restrained medieval correspondence experience; physical materials instead of decorative UI chrome.
+**Experience specification:** [`experience-design.md`](experience-design.md) defines the shared world-building, terminology, state-integrity, journey, accessibility and performance rules that all screen designs must follow.
 
 ## 1. Visual principles
 1. **Material first:** Real paper texture, ink, wax and aged wood convey the theme.
@@ -137,4 +138,4 @@ Review **actual rendered screenshots** on narrow Android (~360px), standard mobi
 **Gate:** Do not declare design complete until the user explicitly approves the rendered screens. A generated mockup is not proof of implementability.
 
 ## 14. Visual decisions still pending
-Exact fonts/licensing, approved texture files, raven illustration style, signet palette and shape, map rendering style, final screen references, animation sequences, and component dimensions. These should be resolved by small visual prototypes rather than speculative large builds.
+Exact fonts/licensing, approved texture files, raven illustration style, signet palette and shape, map rendering style, final screen references, animation sequences, and component dimensions. Human public-identifier terminology is also open: `experience-design.md` records why `Raven ID` conflicts with the carrier/human distinction and proposes alternatives without changing the approved product or backend contract. These decisions should be resolved by small visual prototypes and explicit product-owner approval rather than speculative large builds.

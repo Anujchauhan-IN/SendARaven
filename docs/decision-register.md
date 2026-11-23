@@ -207,6 +207,20 @@ A P0 decision may be deferred only if its affected tables, constraints and API/s
 
 **Technical implications:** persisted presentation values versus render-only values, immutable signet versions, accessibility identity text and migration risk if provisional enums are stored.
 
+### DEC-P1-08 — Human public-identifier terminology
+
+**Blocks:** Phase 1 interface-language finalization and Phase 4 onboarding, lookup and addressing UX; does not block backend work that preserves the existing approved identifier contract.
+
+**Conflict:** `Raven ID` names a human public identifier after the carrier bird, while the experience model requires a raven to mean the carrier, never the human recipient or account holder.
+
+**Reasonable options:**
+- Use `Lettername` as a distinctive interface label with a plain-language explanation.
+- Use `Correspondence name`, `Signet name`, `Address name` or `Public name`.
+- Retain `Raven ID` if the product owner explicitly prefers contract continuity over the terminology distinction.
+- Change only the human-facing label while retaining `raven_id` internally, or separately authorize a backend/API migration.
+
+**Technical implications:** onboarding and lookup copy, accessibility labels, localization, support language, analytics/event names, documentation, compatibility aliases and possible schema/API migration. Immutable account UUIDs, uniqueness, normalization, relationship keys and enumeration protections must not change implicitly.
+
 ## P2 — Safe to defer when omitted from earlier contracts
 
 ### DEC-P2-01 — Map renderer and asset pipeline
