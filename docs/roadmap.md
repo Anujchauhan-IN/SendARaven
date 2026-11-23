@@ -16,7 +16,7 @@ Statuses describe the current repository, not the importance of a feature. Each 
 
 | Area | Status | Current evidence and limits |
 |---|---|---|
-| Repository foundation and application shell | **Partial** | Astro, React, strict TypeScript, Tailwind, shared layout, responsive navigation, build/check scripts, Vitest and Playwright exist. Navigation has mobile/desktop E2E coverage. The current workspace is not inside a Git repository. There is no production SSR adapter, backend environment, CI/CD, staging setup, monitoring, or deployment runbook. |
+| Repository foundation and application shell | **Partial** | Astro, React, strict TypeScript, Tailwind, shared layout, responsive navigation, build/check scripts, Vitest and Playwright exist. Navigation has mobile/desktop E2E coverage. The workspace is the initialized Git repository at `/public/SendARaven`, on `main` with `origin/main` configured. There is no production SSR adapter, backend environment, CI/CD, staging setup, monitoring, or deployment runbook. |
 | Raven Rookery | **Partial** | `src/components/rookery/Rookery.tsx` presents five selectable ravens with responsive artwork and E2E coverage. Statuses, missions, and timers are fixtures; there is no authenticated inventory or server authority. Artwork and the rookery structure are not visually approved production assets. |
 | Letter composer and handwriting | **Partial** | `LetterComposer.tsx` and `src/lib/letters/editor.ts` provide local typed text, normalized vector strokes, pen, eraser, undo/redo, multipage state, serialization, and focused unit/E2E tests. No draft persistence, autosave decision, production limits, accessible handwriting transcription path, server validation, or Android real-device/IME approval exists. |
 | Authentication, Raven IDs, profiles and city | **Not Started** | No authentication provider integration, SSR sessions, onboarding, Raven ID storage, profile persistence, city dataset, or geolocation flow exists. Settings is a placeholder. |
@@ -58,13 +58,26 @@ Every phase must:
 
 **Tasks:**
 - Maintain the Astro/React/TypeScript/Tailwind application shell, shared layout, route conventions, navigation, error boundaries, and loading/empty/offline presentation patterns.
-- Create and maintain a requirements traceability matrix linking every product `MUST` to a phase and acceptance test; link each `SHOULD` to implementation or a recorded deferral.
-- Maintain an open-decision register with the phase each decision blocks.
+- Create and maintain [`docs/requirements-matrix.md`](requirements-matrix.md), linking every product `MUST` to a phase, acceptance criteria and tests; link each `SHOULD` to implementation or a documented deferral.
+- Maintain [`docs/decision-register.md`](decision-register.md), with unresolved choices, options, implications, priorities and the phases each decision blocks.
 - Record which routes are functional, fixture-driven, placeholder-only, or visually provisional.
 - Define environment boundaries for local, test, staging, and production without adding production secrets to browser code.
 - Establish CI tasks for formatting/linting if adopted, type-check, unit tests, E2E smoke tests, and build; do not add tooling without a demonstrated need.
 - Establish asset metadata requirements: source, licence, dimensions, format, compression, intended use, approval state, and responsive variants.
-- Verify whether the workspace is inside a Git repository and record the result. The current verification found no Git repository. Git initialization is a prerequisite before substantial backend or migration work, but initialization, commits, remotes and pushes require separate authorization.
+- Verify whether the workspace is inside a Git repository and record the result. Verification confirms `/public/SendARaven` is the repository root, on branch `main`, with `origin/main` configured. Do not stage, commit, configure remotes or push without authorization.
+
+**Verified Phase 0 progress:**
+- Requirements traceability baseline created in `docs/requirements-matrix.md`, covering every approved product `MUST`, all `SHOULD` recommendations, acceptance criteria, test categories, implementation status and coverage gaps.
+- Decision register created in `docs/decision-register.md`, prioritizing schema-affecting Phase 3 decisions and separating approved rules from unresolved options.
+- Functional local editor/rookery behavior is distinguished from fixtures, placeholders, provisional visuals and unimplemented backend authority.
+- Current Astro check, production build, editor unit suite and navigation E2E suite pass; navigation coverage includes approximately 360px, 390px and desktop widths.
+- Git repository root, branch and remote tracking status are verified.
+
+**Remaining Phase 0 work:**
+- Define and document local/test/staging/production environment and secret boundaries.
+- Decide whether CI is required now; if adopted, add the scoped type-check, unit, E2E smoke and build workflow.
+- Complete the production-asset metadata inventory and approval/provenance records.
+- Complete baseline 320px, tablet, high-text-zoom, safe-area, reduced-motion, keyboard and representative Android virtual-keyboard checks.
 
 **Required tests and review:**
 - Astro/type check and production build.
@@ -77,7 +90,7 @@ Every phase must:
 - Every approved requirement has a planned phase and test category.
 - Placeholder and fixture behavior is clearly distinguished from working functionality.
 - The application shell passes baseline mobile, keyboard and build checks.
-- Git repository status is documented; if Git is absent, authorized initialization is completed before substantial backend or migration changes begin.
+- Git repository root, branch and remote tracking status are documented.
 
 ---
 
@@ -592,15 +605,15 @@ No contradiction requiring changes to `vision.md`, `product.md`, `design.md`, or
 
 ## 7. Recommended next development phase
 
-**Recommended next work: finish the remaining Phase 0 baseline gate, obtain authorization to initialize Git, and resolve the Phase 3 schema-affecting decision gate. Phase 1/2 visual and interaction review may continue in parallel.**
+**Recommended next work: finish the remaining Phase 0 environment, CI, asset-governance and baseline accessibility/mobile checks, while obtaining approval for the highest-priority Phase 3 schema decisions. Phase 1/2 visual and interaction review may continue in parallel.**
 
-Prerequisites before additional feature implementation:
+Prerequisites before substantial backend implementation:
 
-1. Confirm this roadmap and its phase ordering.
-2. Create the requirement-to-test traceability matrix and decision register described in Phase 0.
-3. Review the existing rookery and composer screenshots as provisional work, including 320px and tablet coverage, Android keyboard/IME behavior, accessibility, and asset approval status.
-4. Decide which visual or interaction refinement proceeds in parallel; unfinished visual approval alone does not block unrelated engineering.
-5. Resolve the schema-affecting decisions listed before Phase 3 and establish database/auth contracts before migrations or protected flows are finalized.
-6. Initialize Git only after explicit authorization and before substantial backend changes.
+1. Review and maintain `docs/requirements-matrix.md` and `docs/decision-register.md` as the traceability sources for later phases.
+2. Define environment and secret boundaries; decide the immediate CI scope.
+3. Complete the outstanding baseline accessibility/mobile checks and asset metadata inventory.
+4. Resolve initial inventory, return/travel semantics, same-city timing, draft policy, content limits and other P0 schema decisions before creating their affected migrations.
+5. Establish database/auth contracts before protected flows are finalized.
+6. Continue visual refinement in parallel; unfinished visual approval alone does not block unrelated engineering.
 
-The current repository is not ready for substantial backend or migration work until Git and the Phase 3 decision gate are addressed. Authentication contract design may overlap with database planning, and visual refinement may continue alongside both.
+The repository and Git prerequisites are satisfied, but Phase 0 remains **Partial** because its environment, CI, asset-governance and baseline verification criteria are incomplete. Phase 3 migrations remain blocked by the P0 decisions in `docs/decision-register.md`.
