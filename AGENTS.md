@@ -16,7 +16,28 @@ Before a task, read `docs/vision.md`, then the relevant parts of `docs/product.m
 - Do not implement future phases without authorization.
 - Android-first development and testing; do not assume desktop access.
 - Test changed behavior, type-check and build at appropriate milestones.
-- Include a short final summary: changed files, checks, limitations, next decision.
+- Keep final task reports brief and follow the permanent reporting rules below.
+
+## Permanent task reporting rules
+At the end of every completed coding or documentation task, report:
+1. A concise summary of changes.
+2. Files modified.
+3. Tests actually executed and their results.
+4. Remaining issues, if any.
+5. A section titled `Git Commands`.
+
+When files changed, the `Git Commands` section must contain exactly three copy-paste-ready commands together in one Bash code block:
+```bash
+git add .
+git commit -m "type: descriptive message"
+git push
+```
+
+- Replace the example commit message with an accurate Conventional Commit message for the completed task; never output a placeholder commit message.
+- Do not automatically stage, commit, configure remotes, or push.
+- Do not include unrelated modifications in the proposed commit. If unrelated changes exist, replace `git add .` with `git add` followed by explicit paths for only the task's files.
+- Do not claim a push succeeded unless it was actually executed and verified.
+- If the task made no file changes, state that no Git commit is required instead of providing misleading Git commands.
 
 ## Skill and visual verification workflow
 - Before creating or substantially redesigning a UI screen, read and apply the `frontend-design` skill.
