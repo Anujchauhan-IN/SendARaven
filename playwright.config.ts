@@ -10,7 +10,9 @@ export default defineConfig({
     baseURL: 'http://127.0.0.1:4321',
     trace: 'retain-on-failure',
     launchOptions: {
-      executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE ?? '/usr/bin/chromium',
+      ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE
+        ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE }
+        : process.env.CI ? {} : { executablePath: '/usr/bin/chromium' }),
       args: ['--disable-gpu', '--use-gl=swiftshader'],
     },
   },

@@ -50,7 +50,7 @@ Every phase must:
 
 ### Phase 0 — Baseline, application shell and requirements traceability
 
-**Current status: Partial**
+**Current status: Complete**
 
 **Purpose:** Establish a reliable foundation and remove stale assumptions before adding security-sensitive behavior.
 
@@ -61,23 +61,26 @@ Every phase must:
 - Create and maintain [`docs/requirements-matrix.md`](requirements-matrix.md), linking every product `MUST` to a phase, acceptance criteria and tests; link each `SHOULD` to implementation or a documented deferral.
 - Maintain [`docs/decision-register.md`](decision-register.md), with unresolved choices, options, implications, priorities and the phases each decision blocks.
 - Record which routes are functional, fixture-driven, placeholder-only, or visually provisional.
-- Define environment boundaries for local, test, staging, and production without adding production secrets to browser code.
-- Establish CI tasks for formatting/linting if adopted, type-check, unit tests, E2E smoke tests, and build; do not add tooling without a demonstrated need.
-- Establish asset metadata requirements: source, licence, dimensions, format, compression, intended use, approval state, and responsive variants.
+- Maintain [`docs/environment-boundaries.md`](environment-boundaries.md) for local, test, staging and production isolation and secret handling.
+- Maintain the lightweight GitHub Actions workflow in `.github/workflows/ci.yml` for dependency installation, Astro check, unit tests, production build and Playwright browser tests.
+- Maintain [`docs/asset-inventory.md`](asset-inventory.md) with source, licence, dimensions, format, size, intended use and approval status.
 - Verify whether the workspace is inside a Git repository and record the result. Verification confirms `/public/SendARaven` is the repository root, on branch `main`, with `origin/main` configured. Do not stage, commit, configure remotes or push without authorization.
 
 **Verified Phase 0 progress:**
 - Requirements traceability baseline created in `docs/requirements-matrix.md`, covering every approved product `MUST`, all `SHOULD` recommendations, acceptance criteria, test categories, implementation status and coverage gaps.
 - Decision register created in `docs/decision-register.md`, prioritizing schema-affecting Phase 3 decisions and separating approved rules from unresolved options.
 - Functional local editor/rookery behavior is distinguished from fixtures, placeholders, provisional visuals and unimplemented backend authority.
-- Current Astro check, production build, editor unit suite and navigation E2E suite pass; navigation coverage includes approximately 360px, 390px and desktop widths.
+- Environment and secret boundaries are documented without creating credentials or provisioning services.
+- A minimal no-secret CI workflow uses the existing reliable scripts and installs Playwright Chromium on the runner.
+- Existing visual assets are inventoried; unknown provenance/licensing and provisional approval are explicit.
+- Astro check, production build, unit tests and the full Playwright suite pass locally. Application-shell coverage includes 320px, 360px, 390px, 768px and 1280px, keyboard focus, skip navigation, horizontal overflow, simulated 200% text size, reduced-motion emulation, accessible names and image metadata.
+- Rendered baseline screenshots were generated and representative mobile, tablet and desktop results inspected; the discovered 768px navigation collision was corrected and reverified.
 - Git repository root, branch and remote tracking status are verified.
 
-**Remaining Phase 0 work:**
-- Define and document local/test/staging/production environment and secret boundaries.
-- Decide whether CI is required now; if adopted, add the scoped type-check, unit, E2E smoke and build workflow.
-- Complete the production-asset metadata inventory and approval/provenance records.
-- Complete baseline 320px, tablet, high-text-zoom, safe-area, reduced-motion, keyboard and representative Android virtual-keyboard checks.
+**Documented limitations carried to affected later gates:**
+- Real Android software keyboard, orientation, hardware safe areas, TalkBack/other screen readers, stylus gestures, non-Chromium browsers and dedicated contrast tooling were not available. See [`docs/phase-0-verification.md`](phase-0-verification.md).
+- The GitHub Actions workflow is locally validated through its component commands; its first hosted-run result remains to be observed after an authorized push.
+- Asset provenance, licensing and final visual approval remain Phase 1/launch requirements, not Phase 0 omissions.
 
 **Required tests and review:**
 - Astro/type check and production build.
@@ -605,15 +608,14 @@ No contradiction requiring changes to `vision.md`, `product.md`, `design.md`, or
 
 ## 7. Recommended next development phase
 
-**Recommended next work: finish the remaining Phase 0 environment, CI, asset-governance and baseline accessibility/mobile checks, while obtaining approval for the highest-priority Phase 3 schema decisions. Phase 1/2 visual and interaction review may continue in parallel.**
+**Recommended next work: proceed with approved Phase 1/2 refinement in parallel with obtaining decisions for the Phase 3 schema gate. Do not create affected migrations until their P0 decisions are approved.**
 
 Prerequisites before substantial backend implementation:
 
-1. Review and maintain `docs/requirements-matrix.md` and `docs/decision-register.md` as the traceability sources for later phases.
-2. Define environment and secret boundaries; decide the immediate CI scope.
-3. Complete the outstanding baseline accessibility/mobile checks and asset metadata inventory.
-4. Resolve initial inventory, return/travel semantics, same-city timing, draft policy, content limits and other P0 schema decisions before creating their affected migrations.
-5. Establish database/auth contracts before protected flows are finalized.
-6. Continue visual refinement in parallel; unfinished visual approval alone does not block unrelated engineering.
+1. Maintain `docs/requirements-matrix.md`, `docs/decision-register.md`, environment boundaries and the asset inventory as later work changes them.
+2. Resolve initial inventory, return/travel semantics, same-city timing, draft policy, content limits and other P0 schema decisions before creating their affected migrations.
+3. Establish database/auth contracts before protected flows are finalized.
+4. Observe the first hosted CI run after an authorized push and correct environment-specific failures if any.
+5. Continue visual refinement in parallel; unfinished visual approval alone does not block unrelated engineering.
 
-The repository and Git prerequisites are satisfied, but Phase 0 remains **Partial** because its environment, CI, asset-governance and baseline verification criteria are incomplete. Phase 3 migrations remain blocked by the P0 decisions in `docs/decision-register.md`.
+Phase 0 is **Complete** for its documentation and application-shell baseline. Real-device, screen-reader, production-asset and cross-browser checks remain explicit requirements of the affected later phases and launch readiness. Phase 3 migrations remain blocked by the P0 decisions in `docs/decision-register.md`.

@@ -92,10 +92,10 @@ export default function LetterComposer() {
   return (
     <section className="writing-room" aria-label="Letter composer">
       <header className="writing-header">
-        <div className="wordmark">SendARaven</div>
+        <div className="wordmark" translate="no">SendARaven</div>
         <label className="recipient-field">
           <span>To</span>
-          <input name="recipient" type="text" inputMode="text" autoComplete="off" placeholder="Raven ID" aria-label="Recipient Raven ID" />
+          <input name="recipient" type="text" inputMode="text" autoComplete="off" spellCheck={false} placeholder="Raven ID" aria-label="Recipient Raven ID" />
         </label>
       </header>
 
@@ -143,7 +143,7 @@ export default function LetterComposer() {
       <footer className="dispatch-bar">
         <label>
           <span>Raven</span>
-          <select aria-label="Choose raven" defaultValue="Swift Raven">
+          <select name="raven" aria-label="Choose raven" defaultValue="Swift Raven">
             {ravens.map((raven) => <option key={raven}>{raven}</option>)}
           </select>
         </label>

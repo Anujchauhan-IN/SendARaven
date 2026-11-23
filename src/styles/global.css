@@ -12,6 +12,9 @@
 html { min-width: 320px; background: #17130f; scroll-padding-block: 88px; }
 body { margin: 0; min-width: 320px; min-height: 100dvh; overflow-x: hidden; }
 button, input, select { font: inherit; }
-a, button, select, input, [contenteditable='true'] { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible, [contenteditable='true']:focus-visible { outline: 3px solid #d6b36b; outline-offset: 3px; }
+a, button, summary, select, input, [contenteditable='true'] { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+a:focus-visible, button:focus-visible, summary:focus-visible, select:focus-visible, input:focus-visible, [contenteditable='true']:focus-visible { outline: 3px solid #d6b36b; outline-offset: 3px; }
+.skip-link { position: fixed; z-index: 100; top: 8px; left: 8px; padding: 10px 14px; color: #21140c; background: #f0d59b; text-decoration: none; transform: translateY(-160%); }
+.skip-link:focus-visible { transform: translateY(0); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 ::selection { background: rgba(126, 65, 42, .28); }

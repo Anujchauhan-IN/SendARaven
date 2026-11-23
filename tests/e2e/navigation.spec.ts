@@ -10,7 +10,7 @@ const destinations = [
 
 function visiblePrimaryNavigation(page: import('@playwright/test').Page) {
   const width = page.viewportSize()?.width ?? 1280;
-  return page.getByRole('navigation', { name: width < 700 ? 'Mobile primary navigation' : 'Desktop primary navigation' });
+  return page.getByRole('navigation', { name: width < 900 ? 'Mobile primary navigation' : 'Desktop primary navigation' });
 }
 
 test('primary navigation reaches every destination from the letter editor', async ({ page }) => {

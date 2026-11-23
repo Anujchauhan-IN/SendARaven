@@ -15,8 +15,6 @@
 }
 
 .rookery-app { min-height: 100%; background: #12100d; color: #f2dfb9; }
-.skip-link { position: fixed; z-index: 100; top: 8px; left: 8px; padding: 10px 14px; color: #21140c; background: #f0d59b; transform: translateY(-150%); }
-.skip-link:focus { transform: translateY(0); }
 svg { width: 1.5em; height: 1.5em; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
 .rookery-main { min-height: calc(100dvh - 68px); background-color: var(--stone-deep); }

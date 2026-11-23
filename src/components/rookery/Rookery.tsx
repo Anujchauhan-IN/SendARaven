@@ -17,7 +17,6 @@ export default function Rookery() {
   const selected = ravens.find((raven) => raven.id === selectedId) ?? ravens[0]!;
   return (
     <div className="rookery-app">
-      <a className="skip-link" href="#rookery-main">Skip to rookery</a>
       <main id="rookery-main" className="rookery-main">
         <section className="rookery-wall" aria-labelledby="rookery-title">
           <div className="wall-vines wall-vines-left" aria-hidden="true" />

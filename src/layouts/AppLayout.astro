@@ -20,8 +20,9 @@ const { title, description = 'Send handwritten letters through a personal rooker
     <title>{title}</title>
   </head>
   <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
     <AppNavigation />
-    <div class="app-content">
+    <div id="main-content" class="app-content" tabindex="-1">
       <slot />
     </div>
   </body>
