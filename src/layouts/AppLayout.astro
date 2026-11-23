@@ -1,0 +1,28 @@
+---
+import '../styles/global.css';
+import '../styles/app-navigation.css';
+import AppNavigation from '../components/layout/AppNavigation.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Send handwritten letters through a personal rookery of messenger ravens.' } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#17130f" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <AppNavigation />
+    <div class="app-content">
+      <slot />
+    </div>
+  </body>
+</html>

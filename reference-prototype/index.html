@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width,initial-scale=1"
+        />
+        <meta
+            name="theme-color"
+            content="#261b15"
+        />
+        <title>SendARaven — Your Raven Rookery</title>
+        <link
+            rel="stylesheet"
+            href="./styles.css"
+        />
+    </head>
+    <body>
+        <div class="app">
+            <aside
+                class="rail"
+                aria-label="Main navigation"
+            >
+                <a
+                    class="brand"
+                    href="#"
+                    aria-label="SendARaven"
+                    >✦<span>SendARaven</span></a
+                >
+                <nav>
+                    <button
+                        class="nav active"
+                        data-view="rookery"
+                    >
+                        <span>⌂</span><b>My Rookery</b>
+                    </button>
+                    <button
+                        class="nav"
+                        data-view="write"
+                    >
+                        <span>✒</span><b>Write Letter</b>
+                    </button>
+                    <button
+                        class="nav"
+                        data-view="flights"
+                    >
+                        <span>➶</span><b>Flights</b>
+                    </button>
+                    <button
+                        class="nav"
+                        data-view="inbox"
+                    >
+                        <span>✉</span><b>Inbox</b>
+                    </button>
+                </nav>
+                <div class="rail-foot">
+                    <div class="avatar">AC</div>
+                    <div>
+                        <strong>Wandering Crow</strong
+                        ><small>@wanderingcrow</small>
+                    </div>
+                </div>
+            </aside>
+            <main class="main">
+                <header class="topbar">
+                    <div class="eyebrow">
+                        SendARaven <span>·</span> YOUR RAVEN ROOKERY
+                    </div>
+                    <div class="top-actions">
+                        <span
+                            class="date"
+                            id="today"
+                        ></span
+                        ><span
+                            class="seal"
+                            title="Your signet"
+                            >AC</span
+                        >
+                    </div>
+                </header>
+                <section
+                    id="rookery"
+                    class="view"
+                >
+                    <div class="heading">
+                        <div>
+                            <div class="overline">
+                                A HOME FOR YOUR MESSENGERS
+                            </div>
+                            <h1>Your Raven Rookery</h1>
+                            <p>
+                                Five loyal ravens. Each with a journey of their
+                                own.
+                            </p>
+                        </div>
+                        <button
+                            class="primary"
+                            id="writeButton"
+                        >
+                            ✒ &nbsp; Compose a Letter
+                        </button>
+                    </div>
+                    <div class="stats">
+                        <div>
+                            <span>YOUR FLOCK</span
+                            ><strong>05 <small>/ 05</small></strong>
+                        </div>
+                        <div>
+                            <span>READY TO FLY</span
+                            ><strong id="readyCount">03</strong>
+                        </div>
+                        <div>
+                            <span>ON THEIR WAY</span
+                            ><strong id="flightCount">02</strong>
+                        </div>
+                    </div>
+                    <div class="section-heading">
+                        <h2>The Rookery</h2>
+                        <span>SELECT A RAVEN TO INSPECT</span>
+                    </div>
+                    <div
+                        class="rookery-grid"
+                        id="rookeryGrid"
+                    ></div>
+                    <div class="footnote">
+                        <span>✧</span> A raven may depart once every 24 hours,
+                        and must return home before its next journey.
+                    </div>
+                </section>
+                <section
+                    id="write"
+                    class="view hidden"
+                >
+                    <div class="heading writing-heading">
+                        <div>
+                            <div class="overline">
+                                INK, PAPER & DISTANT LANDS
+                            </div>
+                            <h1>Compose a Letter</h1>
+                            <p>
+                                Write directly on the parchment. This prototype
+                                keeps everything on this device only.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="compose-shell">
+                        <div class="writing-column">
+                            <div
+                                class="writing-controls"
+                                aria-label="Letter controls"
+                            >
+                                <label
+                                    class="recipient-field"
+                                    for="recipient"
+                                    ><span>Letter to</span
+                                    ><input
+                                        id="recipient"
+                                        placeholder="@recipient-raven-id"
+                                        autocomplete="off"
+                                        autocapitalize="none"
+                                        spellcheck="false"
+                                /></label>
+                                <div
+                                    class="mode"
+                                    role="group"
+                                    aria-label="Writing mode"
+                                >
+                                    <button
+                                        class="selected"
+                                        id="typeMode"
+                                        type="button"
+                                        aria-pressed="true"
+                                    >
+                                        Type</button
+                                    ><button
+                                        id="handMode"
+                                        type="button"
+                                        aria-pressed="false"
+                                    >
+                                        Write by hand
+                                    </button>
+                                </div>
+                                <div
+                                    class="hand-tools hidden"
+                                    id="handTools"
+                                    aria-label="Handwriting tools"
+                                >
+                                    <button
+                                        id="undoInk"
+                                        type="button"
+                                        disabled
+                                    >
+                                        Undo</button
+                                    ><button
+                                        id="redoInk"
+                                        type="button"
+                                        disabled
+                                    >
+                                        Redo</button
+                                    ><button
+                                        id="clearInk"
+                                        type="button"
+                                        disabled
+                                    >
+                                        Clear page
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="parchment-stage">
+                                <div
+                                    class="parchment-surface"
+                                    id="parchmentSurface"
+                                >
+                                    <img
+                                        src="./assets/1795364364586.png"
+                                        alt=""
+                                        draggable="false"
+                                    />
+                                    <textarea
+                                        id="letterText"
+                                        aria-label="Letter text"
+                                        placeholder="Tap here and begin your letter…"
+                                        spellcheck="true"
+                                    ></textarea>
+                                    <canvas
+                                        id="inkCanvas"
+                                        class="hidden"
+                                        aria-label="Handwriting surface. Draw with a finger, stylus or mouse."
+                                    ></canvas>
+                                </div>
+                            </div>
+                            <div
+                                class="page-navigation"
+                                aria-label="Letter pages"
+                            >
+                                <button
+                                    id="previousPage"
+                                    type="button"
+                                    disabled
+                                >
+                                    Previous
+                                </button>
+                                <span
+                                    id="pageStatus"
+                                    aria-live="polite"
+                                    >Page 1 of 1</span
+                                >
+                                <button
+                                    id="addPage"
+                                    type="button"
+                                >
+                                    Add page
+                                </button>
+                                <button
+                                    id="nextPage"
+                                    type="button"
+                                    disabled
+                                >
+                                    Next
+                                </button>
+                            </div>
+                            <p
+                                class="writing-hint"
+                                id="writingHint"
+                            >
+                                Tap within the safe inner area to place the
+                                cursor and type.
+                            </p>
+                        </div>
+                        <aside
+                            class="dispatch"
+                            aria-label="Prototype dispatch controls"
+                        >
+                            <h2>Before you send</h2>
+                            <p>
+                                Choose your courier from the rookery. Dispatch
+                                remains disabled in this visual prototype.
+                            </p>
+                            <label for="birdSelect">Your messenger</label
+                            ><select id="birdSelect">
+                                <option value="">Choose a raven</option>
+                            </select>
+                            <div
+                                class="small-note"
+                                id="dispatchNote"
+                            >
+                                No messages are sent or saved.
+                            </div>
+                            <button
+                                class="primary full"
+                                id="dispatchButton"
+                                type="button"
+                            >
+                                Seal &amp; Dispatch
+                            </button>
+                        </aside>
+                    </div>
+                </section>
+                <section
+                    id="flights"
+                    class="view hidden"
+                >
+                    <div class="heading">
+                        <div>
+                            <div class="overline">BEYOND THE HORIZON</div>
+                            <h1>Flights in Progress</h1>
+                            <p>
+                                Only you can see your ravens on their journeys.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="placeholder">
+                        <div class="compass">✧</div>
+                        <h2>The flight map comes next</h2>
+                        <p>
+                            The finished map will use accurate coastlines styled
+                            as aged cartography, with only departure and
+                            destination cities labeled.
+                        </p>
+                    </div>
+                </section>
+                <section
+                    id="inbox"
+                    class="view hidden"
+                >
+                    <div class="heading">
+                        <div>
+                            <div class="overline">
+                                LETTERS THAT HAVE FOUND YOU
+                            </div>
+                            <h1>Your Letters</h1>
+                            <p>
+                                No one knows a letter is coming until the raven
+                                arrives.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="placeholder">
+                        <div class="compass">✉</div>
+                        <h2>Your desk is quiet</h2>
+                        <p>
+                            Delivered letters and stranger requests will appear
+                            here. Nothing is revealed before arrival.
+                        </p>
+                    </div>
+                </section>
+            </main>
+        </div>
+        <script src="./script.js"></script>
+    </body>
+</html>

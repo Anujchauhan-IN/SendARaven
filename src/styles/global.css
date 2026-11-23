@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+  font-family: Georgia, 'Times New Roman', serif;
+  background: #17130f;
+  color: #ede1c6;
+  font-synthesis: none;
+}
+
+* { box-sizing: border-box; }
+html { min-width: 320px; background: #17130f; scroll-padding-block: 88px; }
+body { margin: 0; min-width: 320px; min-height: 100dvh; overflow-x: hidden; }
+button, input, select { font: inherit; }
+a, button, select, input, [contenteditable='true'] { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible, [contenteditable='true']:focus-visible { outline: 3px solid #d6b36b; outline-offset: 3px; }
+::selection { background: rgba(126, 65, 42, .28); }
