@@ -1,6 +1,6 @@
 # Decision Register
 
-**Status:** Consolidated unresolved product and architecture decisions.  
+**Status:** Consolidated unresolved product and architecture decisions, with approved outcomes retained where they close a recorded decision.
 **Authority:** A listed option is not approval. Decisions become binding only when explicitly approved and recorded in the authoritative product or architecture documentation.  
 **Priority:** `P0` must be resolved before the affected Phase 3 initial schema/migration; `P1` blocks a later core phase; `P2` may safely wait for a later forward-only migration or implementation phase if omitted from earlier contracts.
 
@@ -20,6 +20,8 @@
 - Replies are new dispatches requiring an eligible raven.
 - Notifications occur only after delivery and failure cannot undo delivery.
 - Admin private-letter access is report-scoped, minimal and audited.
+- The human public identifier is Username. Usernames are immutable, case-insensitively unique, 3–24 lowercase Latin letters/digits/underscores, and protected by reserved-name rules.
+- A raven is exclusively a letter carrier, never a person's identity. Relationships bind immutable account UUIDs internally.
 
 ## P0 — Resolve before affected Phase 3 initial schema
 
@@ -88,17 +90,13 @@ A P0 decision may be deferred only if its affected tables, constraints and API/s
 
 **Technical implications:** column/storage types, check constraints, request and transaction size, resource exhaustion controls, rendering performance, worker throughput and boundary/malicious-payload tests.
 
-### DEC-P0-06 — Raven ID syntax, mutability and reserved names
+### DEC-P0-06 — Username syntax, mutability and reserved names
 
-**Blocks:** Phase 3 profile uniqueness if profiles are included initially; Phase 4 onboarding and abuse controls.
+**Status: APPROVED.**
 
-**Reasonable options:**
-- Approve proposed 3–24 lowercase Latin letters/digits/underscores or another syntax.
-- Make public Raven IDs immutable.
-- Permit changes with history, cooldown, redirects or reserved previous names.
-- Define reserved-name and impersonation protections.
+**Decision:** The public identifier is Username. Usernames are immutable, case-insensitively unique, 3–24 lowercase Latin letters, digits or underscores, with reserved-name protections. Immutable internal account UUIDs remain the relationship keys. Optional display names are presentation data and are not identifiers.
 
-**Technical implications:** normalized/display columns, case-insensitive unique index, concurrent signup, rename history, relationship references, lookup RPCs, enumeration resistance and audit/rate limiting. The immutable internal UUID remains the relationship key.
+**Technical implications:** normalized Username column, case-insensitive unique index, concurrent signup protection, reserved-name validation, lookup RPCs, enumeration resistance and audit/rate limiting. No rename history or redirect contract is required.
 
 ### DEC-P0-07 — Durable privacy-mode representation
 
@@ -209,17 +207,13 @@ A P0 decision may be deferred only if its affected tables, constraints and API/s
 
 ### DEC-P1-08 — Human public-identifier terminology
 
-**Blocks:** Phase 1 interface-language finalization and Phase 4 onboarding, lookup and addressing UX; does not block backend work that preserves the existing approved identifier contract.
+**Status: APPROVED.**
 
-**Conflict:** `Raven ID` names a human public identifier after the carrier bird, while the experience model requires a raven to mean the carrier, never the human recipient or account holder.
+**Decision:** The human public identifier is **Username**. The composer recipient field uses `Address your letter to…`. A raven is exclusively a letter carrier and never the recipient's identity. Internal relationships continue using immutable account UUIDs.
 
-**Reasonable options:**
-- Use `Lettername` as a distinctive interface label with a plain-language explanation.
-- Use `Correspondence name`, `Signet name`, `Address name` or `Public name`.
-- Retain `Raven ID` if the product owner explicitly prefers contract continuity over the terminology distinction.
-- Change only the human-facing label while retaining `raven_id` internally, or separately authorize a backend/API migration.
+**Related approved constraints:** Usernames are immutable, case-insensitively unique, 3–24 lowercase Latin letters, digits or underscores, with reserved-name protections. Optional display names remain distinct presentation data and are not required identifiers.
 
-**Technical implications:** onboarding and lookup copy, accessibility labels, localization, support language, analytics/event names, documentation, compatibility aliases and possible schema/API migration. Immutable account UUIDs, uniqueness, normalization, relationship keys and enumeration protections must not change implicitly.
+**Technical implications:** onboarding and lookup copy, accessibility labels, localization, support language, analytics/event names and documentation use Username. Profile/schema contracts use `username` for the public identifier while relationships use account UUIDs. Existing source placeholder copy remains an implementation dependency for Phase 4 and was not changed by this documentation decision.
 
 ## P2 — Safe to defer when omitted from earlier contracts
 

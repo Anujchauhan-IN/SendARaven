@@ -5,16 +5,16 @@
 
 ## 1. Actors
 - **Visitor:** Can view limited public information, not private letters or tracking.
-- **Registered user:** Owns a Raven ID, rookery, letters, settings, contacts, and friends.
+- **Registered user:** Owns a Username, rookery, letters, settings, contacts, and friends.
 - **Recipient:** User addressed by a sender.
 - **Moderator/admin:** Restricted staff capability for reports, sanctions and abuse response; not ordinary private-letter browsing.
 
 ## 2. Authentication and onboarding
-**MUST:** Email/password and Google OAuth. Each user has an immutable internal UUID and a unique, case-insensitive public Raven ID. Profile includes display name, selected city, signet and preferences. Email verification and OAuth callback handling must be secure.
+**MUST:** Email/password and Google OAuth. Each user has an immutable internal UUID and an immutable, case-insensitively unique public Username. Usernames are 3–24 lowercase Latin letters, digits or underscores and require reserved-name protections. A profile includes selected city, signet and preferences and may include an optional display name distinct from the Username. Email verification and OAuth callback handling must be secure.
 
 **MUST:** Manual city search/selection or permission-based approximate location. Browser geolocation is optional, never mandatory. Convert permitted coordinates to a city and discard raw coordinates unless strictly needed transiently; store a stable city ID and geographic centroid. Explain that city may be visible as part of a flight route to correspondents.
 
-**PROPOSED:** Raven ID length 3–24, lowercase Latin letters/digits/underscores, reserved-name and impersonation safeguards. City change limits for active missions need a rule (recommended: mission snapshots keep origin/destination fixed).
+**PROPOSED:** City change limits for active missions need a rule (recommended: mission snapshots keep origin/destination fixed).
 
 ## 3. Raven inventory
 **MUST:** Up to five ravens per user; the planned initial set contains five different types:
@@ -48,7 +48,7 @@
 **SHOULD:** Plain-text alternative/transcription for handwritten letters to improve accessibility; do not fabricate transcriptions automatically.
 
 ## 5. Dispatch
-**MUST:** Sender chooses recipient by Raven ID, composes letter, chooses eligible raven, and dispatches. Backend validates authenticated identity, recipient existence, blocked relationships, content limits, raven availability, recipient rules, and location availability.
+**MUST:** The composer recipient field is labelled `Address your letter to…` and accepts the recipient's Username. The sender composes the letter, chooses an eligible raven, and dispatches. Backend validates authenticated identity, recipient existence, blocked relationships, content limits, raven availability, recipient rules, and location availability. A raven is exclusively the carrier, never the recipient's identity.
 
 **MUST:** Dispatch is atomic: create letter/mission, snapshot sender/recipient city and seal design, reserve raven, and set timestamps together. Idempotency key prevents duplicate dispatch on retries. Do not consume a raven on failed dispatch.
 
@@ -81,9 +81,9 @@
 **PROPOSED:** When recipient changes privacy setting midflight, classify at arrival; if they block sender, suppress delivery. Exact handling of contact removal after arrival needs a rule.
 
 ## 8. Contacts, friends and blocks
-**MUST:** Contacts are unilateral saved Raven IDs with optional private nickname; saving does not require approval and does not override the recipient's rules.
+**MUST:** Contacts are unilateral saved accounts addressed by Username, with an optional private nickname; saving does not require approval and does not override the recipient's rules. Relationships continue to bind immutable account UUIDs internally.
 **MUST:** Friends require mutual acceptance; support send, accept, decline and cancel request.
-**MUST:** Block by immutable account UUID, not mutable display name; block prevents new letters and friendship interactions; report/block options from letters and requests.
+**MUST:** Block by immutable account UUID, not Username or optional display name; block prevents new letters and friendship interactions; report/block options from letters and requests.
 **SHOULD:** Rate limit requests and avoid account-enumeration leaks.
 
 ## 9. Receiving and replying
@@ -92,9 +92,9 @@
 **PROPOSED:** 'Accept sender' could add contact, but must be explicit and separate from reading.
 
 ## 10. Signet system
-**MUST:** Unique personal signet with username/initials and emblem; users may upload a custom emblem **strictly under 50 KB**. Emblem types: safe raster PNG/WebP; no SVG/HTML uploads from users. Validate signature, dimensions, decompression limits and content server-side, normalize/re-encode and render monochrome relief preview.
+**MUST:** Unique personal signet with Username/initials and emblem; users may upload a custom emblem **strictly under 50 KB**. Emblem types: safe raster PNG/WebP; no SVG/HTML uploads from users. Validate signature, dimensions, decompression limits and content server-side, normalize/re-encode and render monochrome relief preview.
 **MUST:** Store signet snapshot or immutable version reference with each dispatched letter, so historical seals do not change retroactively.
-**PROPOSED:** Initials-only fallback; username truncated or initials used if ring text is too long; limited wax palette.
+**PROPOSED:** Initials-only fallback; Username truncated or initials used if ring text is too long; limited wax palette.
 
 ## 11. Notifications
 **MUST:** Browser notification only after delivery, with explicit user permission and no message contents in notification body by default. In-app inbox updates also only after delivery.
@@ -109,7 +109,7 @@
 
 ## 13. Screen inventory
 1. Landing/intro and authentication
-2. Onboarding: Raven ID, city, signet
+2. Onboarding: Username, city, signet
 3. Raven Rookery (five slots and statuses)
 4. Compose: recipient, typed/freehand parchment, raven selection, seal/dispatch
 5. Sender flight tracking map
@@ -121,7 +121,7 @@
 11. Error, empty, loading and offline states
 
 ## 14. Functional acceptance scenarios
-1. Two users register with distinct Raven IDs; duplicates fail case-insensitively.
+1. Two users register with distinct Usernames; duplicates fail case-insensitively.
 2. User dispatches using eligible Swift Raven; cannot dispatch Swift Raven again during outbound, return or 24-hour window.
 3. Two concurrent dispatch requests for one raven yield exactly one successful mission.
 4. Recipient's API responses, unread counts, subscriptions and notifications reveal no inbound letter before arrival.
@@ -137,7 +137,6 @@
 14. Phantom Raven is instant but cannot be reused within the daily cooldown.
 
 ## 15. Explicit open decisions
-- Raven ID syntax, changing IDs, and reserved words.
 - Typed character cap, handwriting page/point limits, and drafts.
 - Exact privacy labels and whether a fourth 'Requests' mode exists.
 - Minimum flight time for same-city dispatch.

@@ -19,7 +19,7 @@ Statuses describe the current repository, not the importance of a feature. Each 
 | Repository foundation and application shell | **Partial** | Astro, React, strict TypeScript, Tailwind, shared layout, responsive navigation, build/check scripts, Vitest and Playwright exist. Navigation has mobile/desktop E2E coverage. The workspace is the initialized Git repository at `/public/SendARaven`, on `main` with `origin/main` configured. There is no production SSR adapter, backend environment, CI/CD, staging setup, monitoring, or deployment runbook. |
 | Raven Rookery | **Partial** | `src/components/rookery/Rookery.tsx` presents five selectable ravens with responsive artwork and E2E coverage. Statuses, missions, and timers are fixtures; there is no authenticated inventory or server authority. Artwork and the rookery structure are not visually approved production assets. |
 | Letter composer and handwriting | **Partial** | `LetterComposer.tsx` and `src/lib/letters/editor.ts` provide local typed text, normalized vector strokes, pen, eraser, undo/redo, multipage state, serialization, and focused unit/E2E tests. No draft persistence, autosave decision, production limits, accessible handwriting transcription path, server validation, or Android real-device/IME approval exists. |
-| Authentication, Raven IDs, profiles and city | **Not Started** | No authentication provider integration, SSR sessions, onboarding, Raven ID storage, profile persistence, city dataset, or geolocation flow exists. Settings is a placeholder. |
+| Authentication, Usernames, profiles and city | **Not Started** | No authentication provider integration, SSR sessions, onboarding, Username storage, profile persistence, city dataset, or geolocation flow exists. Settings is a placeholder. The current composer and Contacts placeholder still contain legacy `Raven ID` copy. |
 | Signet storage and upload processing | **Not Started** | No signet editor, immutable versions, safe image processing, storage authorization, or upload tests exist. Decorative seal-like UI does not count. |
 | Contacts, friendships, blocks and privacy | **Not Started** | The contacts route is placeholder content. No data model, authorization, privacy routing, request transitions, rate limits, or tests exist. |
 | Raven inventory, dispatch, travel and cooldowns | **Not Started** | Composer dispatch is disabled and rookery timers are fixtures. There is no database inventory, atomic dispatch RPC, idempotency, mission state, distance calculation, return handling, or rolling 24-hour enforcement. |
@@ -187,7 +187,6 @@ Resolve these choices before creating the initial migrations for the affected ta
 - Phantom Raven return semantics; outbound and return travel behavior for all raven types; and the same-city minimum delivery time.
 - Draft persistence location, autosave timing, expiry/recovery and conflict behavior.
 - Typed text, page, stroke, point and serialized-payload limits used by columns, constraints, validation and storage design.
-- Raven ID normalization/change rules if profile identifiers or uniqueness constraints depend on them.
 - Privacy-mode values if they are represented by a durable database enum.
 - Recall, deleted/sanctioned-recipient failure handling, or other unresolved choices that alter letter/mission states, timestamps, ownership, idempotency or rollback behavior.
 
@@ -197,7 +196,7 @@ Decisions may be deferred to later forward-only migrations when their tables and
 - Finalize the logical schema for profiles, cities, raven catalogue/inventory, signet versions, contacts, friendships, blocks, privacy, drafts, letters, handwriting pages, missions, delivery outbox, push subscriptions, reports, moderation actions and idempotency records as they become necessary.
 - Document state machines and ownership of sender-visible versus recipient-private status. Do not expose request placement, opened, read or deleted state to senders.
 - Add forward-only migrations with constraints, indexes, canonical relationship keys, foreign-key behavior and deletion rules.
-- Enforce at database level where practical: case-insensitive Raven ID uniqueness, maximum five ravens, one active mission per raven, valid state transitions, unique relationship pairs and immutable snapshots.
+- Enforce at database level where practical: approved immutable, case-insensitively unique Username rules, maximum five ravens, one active mission per raven, valid state transitions, unique UUID-based relationship pairs and immutable snapshots.
 - Implement deny-by-default RLS and storage policies by actor: visitor, owner/sender, recipient after delivery, unrelated user and restricted admin.
 - Design narrowly scoped security-definer functions with fixed `search_path`, explicit grants, validated caller identity and reviewed ownership.
 - Separate browser-safe configuration from service role, OAuth, push, worker and admin secrets.
@@ -208,7 +207,7 @@ Decisions may be deferred to later forward-only migrations when their tables and
 - Migration-from-empty and migration-forward tests.
 - RLS matrix tests for every introduced table and storage bucket.
 - Direct API tests for unauthorized rows, joins, counts, errors, realtime/subscription channels and storage objects.
-- Constraint tests for duplicate Raven IDs, relationship pairs, raven maximum and invalid state transitions.
+- Constraint tests for duplicate or invalid Usernames, UUID-based relationship pairs, raven maximum and invalid state transitions.
 - Security review of every security-definer function, grant and secret boundary.
 
 **Completion gate:**
@@ -218,24 +217,23 @@ Decisions may be deferred to later forward-only migrations when their tables and
 
 ---
 
-### Phase 4 — Authentication, Raven IDs, profiles, cities and signets
+### Phase 4 — Authentication, Usernames, profiles, cities and signets
 
 **Current status: Not Started**
 
 **Dependencies:** Phase 3 contracts for identity, profile ownership, sessions and RLS. Phase 4 implementation may overlap with Phase 3 once those contracts are established, but protected production flows and persisted user data cannot be finalized until the relevant Phase 3 migrations and authorization tests pass.
 
 **Decision gates before durable implementation:**
-- Raven ID syntax, length, reserved-name and impersonation rules.
-- Human-facing public-identifier terminology: `Raven ID` remains the approved product/backend term until the product owner approves an alternative proposed in `docs/experience-design.md`; a UI-label decision must not silently alter UUID keys or identifier semantics.
+- Exact reserved-Username list and maintenance process must be documented before validation is finalized; the Username syntax, immutability and uniqueness rules are approved.
 - City dataset, licence, geographic coverage, update/version strategy and geolocation-to-city lookup.
 - Signet fallback, long-inscription behavior, palette and final visual options.
 - City-change behavior for active missions must not mutate mission snapshots; any additional restrictions remain unresolved.
 
 **Tasks:**
 - Implement email/password and Google OAuth with email verification, secure callback handling, state/CSRF protections and request-scoped SSR sessions.
-- Implement onboarding for unique case-insensitive Raven ID, display name, manual city selection, optional permission-based approximate location, signet and preferences.
+- Implement onboarding for an immutable, case-insensitively unique Username, manual city selection, optional permission-based approximate location, signet and preferences. An optional display name may be offered but must remain distinct from Username and must not become a new onboarding requirement.
 - Explain city-level route visibility. Discard raw coordinates after transient city lookup; store only approved city identity and centroid data.
-- Define public and private profile fields and enumeration-resistant lookup behavior.
+- Define public and private profile fields and enumeration-resistant Username lookup behavior. Update the legacy composer to the approved `Address your letter to…` label and replace legacy `Raven ID` copy in Contacts during implementation; do not treat the raven as recipient identity.
 - Implement signet versions and safe upload processing: strictly under 50 KB, valid PNG/WebP bytes only, bounded dimensions/decoded size, decompression safeguards, decode/re-encode normalization, monochrome relief preview, no SVG/HTML/polyglots.
 - Prevent cross-account storage writes/reads and preserve immutable historical signet versions.
 - Add signup, login, lookup and upload throttles appropriate to the abuse surface.
@@ -243,14 +241,14 @@ Decisions may be deferred to later forward-only migrations when their tables and
 
 **Required tests and review:**
 - Auth integration tests for verification, login/logout, expired sessions, OAuth state/callback failures and protected routes.
-- Case-insensitive Raven ID race/uniqueness and enumeration tests.
+- Username syntax, reserved-name, immutability, case-insensitive race/uniqueness and enumeration tests.
 - City search, ambiguous names, denied geolocation, coordinate disposal and profile isolation tests.
 - Unsafe image corpus, exact 50 KB boundary, malformed file, dimension/decode limit and cross-account storage policy tests.
 - Responsive, keyboard, screen-reader, high-zoom and Android form/keyboard review.
 
 **Completion gate:**
 - Two isolated users can securely authenticate and maintain separate profiles.
-- Raven IDs and city data follow approved rules.
+- Usernames and city data follow approved rules; optional display names are never relationship or authorization keys.
 - Signet uploads are normalized safely and historical versions cannot be altered retroactively.
 - No private secret or precise location is exposed to the browser.
 
@@ -488,7 +486,7 @@ Decisions may be deferred to later forward-only migrations when their tables and
 - Prevent ordinary admin browsing of unrelated private letters; require report-scoped access and record every sensitive action.
 - Enforce suspension/ban behavior consistently across auth, friendships, dispatch, delivery and notifications.
 - Implement approved retention, export/deletion and appeal workflows without silently inventing policy.
-- Add abuse controls at every exposed surface: signup, Raven ID lookup, friend requests, dispatch, uploads, notifications and reports.
+- Add abuse controls at every exposed surface: signup, Username lookup, friend requests, dispatch, uploads, notifications and reports.
 - Add operational dashboards/alerts for delivery lag, stuck missions, worker failures, notification failures, suspicious rates and admin actions without exposing private content unnecessarily.
 
 **Required tests and review:**
@@ -568,8 +566,6 @@ The following remain unresolved unless `docs/product.md` is explicitly updated b
 
 | Decision | Blocks/finalizes |
 |---|---|
-| Raven ID syntax, length, reserved names and impersonation safeguards | Phase 4 validation and abuse controls |
-| Human public-identifier terminology replacing the conceptually incorrect UI term `Raven ID` | Phase 1 language system and Phase 4 onboarding/lookup UX; does not itself authorize a backend rename |
 | Initial raven allocation and inventory lifecycle rules | Phase 2 final rookery states; Phase 3 initial inventory schema; Phase 6 inventory creation |
 | Phantom return behavior and outbound/return travel assumptions | Phase 3 mission state/schema; Phase 6 timestamps/state transitions |
 | Same-city minimum travel duration | Phase 3 mission constraints if encoded there; Phase 6 travel calculation |
@@ -587,7 +583,7 @@ The following remain unresolved unless `docs/product.md` is explicitly updated b
 | Content rules, report categories, retention, deletion, appeals, legal notices and age policy | Phase 11 and launch |
 | Operational budgets, staging and monitoring choices | Phases 12 and 13 |
 
-Approved rules that must not be reopened accidentally include: up to five ravens; listed raven speeds; one dispatch per raven per rolling 24 hours and return-before-reuse; instant Phantom delivery; Contacts Only strangers arriving as requests; no `Nobody` privacy option; no advance recipient notice; sender-only tracking; no sender access to read/delete/request state; and signet uploads strictly under 50 KB.
+Approved rules that must not be reopened accidentally include: immutable, case-insensitively unique 3–24 character Usernames with reserved-name protections and UUID-based relationships; ravens exclusively as carriers; up to five ravens; listed raven speeds; one dispatch per raven per rolling 24 hours and return-before-reuse; instant Phantom delivery; Contacts Only strangers arriving as requests; no `Nobody` privacy option; no advance recipient notice; sender-only tracking; no sender access to read/delete/request state; and signet uploads strictly under 50 KB.
 
 ## 6. Verified roadmap corrections and missing requirements
 
@@ -606,7 +602,7 @@ This revision corrects the prior roadmap by:
 - Recording Git verification and requiring authorized repository initialization before substantial backend changes when Git is absent.
 - Adding signet upload attack cases, immutable version tests, map data licensing, asset governance, backup restoration and staged deployment gates.
 
-No contradiction requiring changes to `vision.md`, `product.md`, `design.md`, or `architecture.md` was verified. Their unresolved choices remain intentionally unresolved here.
+The approved DEC-P1-08 terminology decision required coordinated updates to `vision.md`, `product.md`, `experience-design.md`, `design.md`, `architecture.md`, this roadmap and the requirements matrix. Remaining unresolved choices are still intentionally unresolved.
 
 ## 7. Recommended next development phase
 

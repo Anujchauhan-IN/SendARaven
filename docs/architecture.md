@@ -48,7 +48,7 @@ Do not create all empty folders merely for appearance; add them when needed.
 ## 4. Logical data model (proposed)
 | Table | Important fields | Notes |
 |---|---|---|
-| `profiles` | user_id PK, raven_id UNIQUE normalized, display_name, city_id, signet_version | Auth-owned UUID |
+| `profiles` | user_id PK, username UNIQUE normalized, display_name nullable, city_id, signet_version | Auth-owned UUID; Username is immutable and relationships use `user_id` |
 | `cities` | id, name, country_code, latitude, longitude, source_version | City centroids, no street addresses |
 | `raven_types` | id, name, speed_kmh, instant | Immutable catalog |
 | `user_ravens` | id, owner_id, type_id, last_dispatched_at, active_mission_id | Max five enforced in DB |
@@ -120,7 +120,7 @@ A scheduled worker queries due missions in bounded batches:
 - Sender can select own outgoing letters and missions, but not recipient-private opened/request/delete flags.
 - Recipient can select incoming letters **only after delivery transition**; never merely based on `arrival_at` in client-side filters.
 - Recipient cannot select in-flight missions addressed to them, including via joins, counts, realtime events, RPC error messages or push subscriptions.
-- Signet/public profile data only expose intentionally public fields; private email, auth data and precise coordinates remain hidden.
+- Signet/public profile data only expose intentionally public fields. Username is the immutable public identifier; any display name is optional presentation data. Private email, auth data and precise coordinates remain hidden.
 - Block relationships and contact lists should not be broadly enumerable.
 - Private handwritten payload and storage object access must follow same letter ACL.
 - Admins receive narrow report-based content access; no unrestricted reading through application interfaces.
@@ -142,7 +142,8 @@ A scheduled worker queries due missions in bounded batches:
 
 ## 12. Authentication/session model
 - Use Supabase SSR session handling appropriate for Astro/Cloudflare.
-- Request-scoped server clients; validate identity on every protected action.
+- Store the approved immutable public identifier as normalized `username`; enforce case-insensitive uniqueness, syntax and reserved-name validation transactionally. Optional `display_name` is nullable presentation data only.
+- Request-scoped server clients; validate identity on every protected action and use immutable account UUIDs for relationships and authorization.
 - Google OAuth with CSRF/state and correct redirect URI handling.
 - Protect `/admin/**` with server authorization, not just client routing.
 - Do not put service role, notification private keys, OAuth secrets or admin tokens in public env vars.

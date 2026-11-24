@@ -12,7 +12,7 @@ SendARaven is a **real user-to-user correspondence platform**, not a chat reskin
 ### Pillars
 1. **Anticipation:** No incoming-flight hints for recipients. A letter is unknown until delivered.
 2. **Tactility:** Real-looking paper, ink, wood, and wax; the writing surface is the parchment itself.
-3. **Personal identity:** Raven ID and custom signet, not generic profile-picture chat bubbles.
+3. **Personal identity:** Immutable public Username and custom signet, not generic profile-picture chat bubbles. A raven is exclusively the letter carrier.
 4. **Meaningful constraints:** Five ravens maximum; each dispatches at most once per rolling 24 hours and must return before reuse.
 5. **Privacy by design:** Only city-level journey locations; letter access and privacy enforced on the server.
 6. **Accessible craft:** Visually evocative, but fast and usable on Android, desktop, keyboard, touch and assistive technology.

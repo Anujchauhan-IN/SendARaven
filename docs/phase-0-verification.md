@@ -35,7 +35,7 @@ The initial 768px screenshot exposed overlapping desktop navigation. The applica
 - Added one global “Skip to main content” link and focusable target.
 - Added visible focus treatment for the menu `summary` element.
 - Added a visually hidden `h1` to the writing route.
-- Added spellcheck suppression for the Raven ID field and a `name` for the raven selector.
+- Added spellcheck suppression for the then-labelled `Raven ID` field (now approved as Username; source copy remains to be updated in Phase 4) and a `name` for the raven selector.
 - Marked the composer wordmark as non-translatable.
 - Kept existing explicit image dimensions, decorative alternative text, control labels, touch targets, safe-area CSS and reduced-motion handling.
 

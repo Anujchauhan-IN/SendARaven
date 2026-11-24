@@ -1,6 +1,6 @@
 # SendARaven — Experience Design Specification
 
-**Status:** Experience direction established; screen compositions, terminology replacements and production assets still require explicit product-owner approval.  
+**Status:** Experience direction established; Username terminology is approved, while screen compositions and production assets still require explicit product-owner approval.
 **Document role:** Defines how approved product behavior becomes one coherent, immersive and accessible medieval correspondence world.  
 **Authority:** `docs/vision.md` and approved `MUST` requirements in `docs/product.md` remain authoritative. This document does not approve unresolved product, architecture or visual decisions.  
 **Related documents:** `docs/design.md` defines the material system and asset constraints; `docs/architecture.md` defines trusted application state and security boundaries; `docs/decision-register.md` records unresolved choices.
@@ -164,18 +164,18 @@ Delete and block are separate actions. Reading never silently creates a contact 
 
 ### 3.7 Correspondents and identity
 
-People are represented through a public identifier, display name, city-level identity where appropriate, and signet—not profile-picture chat bubbles.
+People are represented through an immutable public Username, an optional display name where provided, city-level identity where appropriate, and signet—not profile-picture chat bubbles. Username and display name must remain visibly distinct.
 
 The correspondence ledger should feel like a practical bound register or set of written entries, while preserving efficient search, sorting, keyboard navigation and touch targets. Decorative handwriting must not make names hard to scan.
 
 Approved relationship meanings remain unchanged:
 
-- **Contact:** a unilateral saved person, optionally with a private nickname.
+- **Contact:** a unilateral saved account addressed by Username, optionally with a private nickname; the relationship binds the immutable account UUID.
 - **Friend:** a mutually accepted relationship.
 - **Blocked person:** identified internally by immutable account UUID; blocking overrides normal delivery.
 - **Correspondent:** a proposed umbrella interface term for a person with whom the user writes or may write. It does not replace Contact or Friend semantics.
 
-Identity lookup must avoid account-enumeration leakage. Public presentation may be immersive; errors such as unknown or unavailable addressee remain privacy-safe and plain.
+Identity lookup by Username must avoid account-enumeration leakage. Public presentation may be immersive; errors such as unknown or unavailable addressee remain privacy-safe and plain.
 
 ### 3.8 Settings, authentication, notifications and error states
 
@@ -267,7 +267,7 @@ Motion follows force and cause: a press depresses wax, a fold changes paper geom
 - Interrupted animations settle into the correct committed state.
 - Looping motion is exceptional and must stop when off-screen, backgrounded or unnecessary.
 
-## 5. Terminology guide and open identity decision
+## 5. Terminology guide and approved identity decision
 
 ### 5.1 Fixed semantic rules
 
@@ -278,31 +278,22 @@ Motion follows force and cause: a press depresses wax, a fold changes paper geom
 - A **rookery** contains the user's ravens; it is not the user's public identity.
 - A **signet** is the user's seal identity asset; it does not replace readable identity text.
 
-### 5.2 Conflict: `Raven ID`
+### 5.2 Username
 
-The approved product currently calls a person's unique public identifier `Raven ID`. This conflicts with the experience model because the raven is the carrier, not the person. The existing backend/product contract must remain unchanged until the product owner approves a replacement and its migration scope.
+**APPROVED:** The human public identifier is **Username**. A Username is immutable, case-insensitively unique, 3–24 lowercase Latin letters, digits or underscores, and protected by reserved-name rules. Internal relationships continue to use immutable account UUIDs rather than Username or display name.
 
-**OPEN terminology options:**
-
-| Candidate | Strengths | Risks |
-|---|---|---|
-| **Lettername** | Distinctive, short and clearly tied to correspondence | Invented term requires onboarding explanation and localization review |
-| **Correspondence name** | Clear and human-focused | Long for labels and addressing fields |
-| **Signet name** | Connects identity to the personal seal | Could imply the signet inscription and identifier must be identical |
-| **Address name** | Directly explains lookup and delivery use | Less distinctive and may sound like a postal address |
-| **Public name** | Familiar and accessible | Can be confused with mutable display name |
-
-**Recommended for product-owner evaluation, not approval:** Use **Lettername** as the immersive UI term, accompanied initially by explanatory copy such as “Your unique correspondence name.” Keep `raven_id` as the internal/schema term until a separately approved contract migration is justified. An approved UI-label change must not silently alter UUID relationship keys, uniqueness, syntax, mutability or enumeration protections.
+An optional display name is presentation text only. It does not replace the Username, need not be present, and must never be used as an authorization or relationship key.
 
 ### 5.3 Addressing and relationship language
 
-Proposed interface phrases pending terminology approval:
+Approved and retained interface language:
 
-- `Address to` rather than `Send raven to`.
-- `Enter Lettername` or the eventual approved public-identifier label.
-- `Choose a correspondent` when selecting an existing known person.
+- The composer recipient field uses `Address your letter to…`.
+- Recipient lookup accepts Username.
+- `Choose a correspondent` may be used when selecting an existing known person.
 - `Contacts`, `Friends`, `Friend requests` and `Blocked` retain their approved meanings.
 - `Correspondents` may label the combined relationship area, but must not imply that every correspondent is a Contact or Friend.
+- A raven always means the carrier bird, never the human recipient or their identity.
 
 ## 6. Complete user journeys
 
@@ -311,14 +302,14 @@ Proposed interface phrases pending terminology approval:
 1. Visitor reaches a focused threshold that communicates slow, private correspondence without a long decorative prelude.
 2. Visitor chooses email/password or Google OAuth using recognizable controls.
 3. Verification and callback states explain progress and recovery plainly.
-4. User chooses the currently approved public identifier, display name and city; city-level route visibility is explained.
+4. User chooses an immutable Username and city; an optional display name may be offered but is not required. City-level route visibility is explained.
 5. User creates or confirms a signet using readable identity text and safe imagery.
 6. User enters the rookery and receives a clear explanation of raven availability without assuming unresolved initial allocation rules.
 
 ### 6.2 Writing and dispatching correspondence
 
 1. User starts `Write a letter` from the rookery, correspondence ledger or a reply action.
-2. User addresses a recipient by the approved public identifier or selects a known correspondent.
+2. User uses `Address your letter to…` to enter the recipient's Username or selects a known correspondent.
 3. User types or writes by hand directly on parchment, moving between pages without losing content.
 4. User reviews the letter, addressee and signet, then folds and seals it.
 5. User chooses an actually eligible raven and reviews travel information.
@@ -438,9 +429,10 @@ No screen, term, production asset or animation is approved merely because it app
 
 ## 11. Conflicts and unresolved design decisions
 
-### Existing conflict recorded, not resolved
+### Approved terminology dependency
 
-- `Raven ID` describes a human identifier using the carrier's name. This specification proposes alternatives but preserves the approved product/backend contract until explicit approval.
+- `Username` replaces `Raven ID` in product language and future contracts. Existing application placeholder copy still requires a later implementation change; this documentation update does not implement it.
+- A raven remains exclusively the carrier. Relationships remain bound to immutable account UUIDs.
 
 ### Product decisions that continue to constrain experience design
 
@@ -455,7 +447,6 @@ No screen, term, production asset or animation is approved merely because it app
 
 ### Visual and interaction decisions still requiring approval
 
-- Human public-identifier terminology and related interface copy.
 - Final screen compositions and navigation labels.
 - Fonts, multilingual coverage and licensing.
 - Production textures, raven art, rookery architecture, envelope construction and wax presentation.
