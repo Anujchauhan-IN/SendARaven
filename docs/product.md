@@ -12,12 +12,12 @@
 ## 2. Authentication and onboarding
 **MUST:** Email/password and Google OAuth. Each user has an immutable internal UUID and an immutable, case-insensitively unique public Username. Usernames are 3–24 lowercase Latin letters, digits or underscores and require reserved-name protections. A profile includes selected city, signet and preferences and may include an optional display name distinct from the Username. Email verification and OAuth callback handling must be secure.
 
-**MUST:** Manual city search/selection or permission-based approximate location. Browser geolocation is optional, never mandatory. Convert permitted coordinates to a city and discard raw coordinates unless strictly needed transiently; store a stable city ID and geographic centroid. Explain that city may be visible as part of a flight route to correspondents.
+**MUST:** Initial onboarding uses manual city search over licensed, versioned city data with stable city IDs and geographic centroids. Permission-based approximate location may be added later but is never mandatory. Convert permitted coordinates to a city and discard raw coordinates unless strictly needed transiently. Explain that city may be visible as part of a flight route to correspondents.
 
-**PROPOSED:** City change limits for active missions need a rule (recommended: mission snapshots keep origin/destination fixed).
+**MUST:** Active missions retain immutable origin/destination city and centroid snapshots; later profile-city or dataset changes never rewrite them. Any additional restriction on when a user may change their profile city remains an implementation/product detail for Phase 4.
 
 ## 3. Raven inventory
-**MUST:** Up to five ravens per user; the planned initial set contains five different types:
+**MUST:** Every account has a fixed initial inventory of exactly five ravens, one of each approved type:
 | Type | Delivery speed | Notes |
 |---|---:|---|
 | Phantom Raven | Instant | Fictional special case |
@@ -28,9 +28,9 @@
 
 **MUST:** Each raven can dispatch **no more than once in any rolling 24-hour period** and cannot dispatch until its current mission, including the return leg, is complete. Server time and transactional locks decide eligibility. A raven may be available after 24 hours only if already returned; a long mission may exceed 24 hours.
 
-**PROPOSED:** Everyone begins with one of each type; no breeding, buying, upgrading, or monetized speed boosts. The Phantom Raven delivers instantly but cannot dispatch again for 24 hours. Its return can be treated as instantaneous, with daily cooldown still applying.
+**MUST:** Every account begins with exactly one raven of each approved type. Custom raven names, acquisition and replacement are not supported initially; there is no breeding, buying, upgrading or monetized speed boost.
 
-**PROPOSED:** All other ravens fly home at their outward speed; time = route distance / speed for each leg. No weather, fatigue or terrain modifiers initially. Arrival and return timestamps are fixed at dispatch.
+**MUST:** Phantom delivery and return are instantaneous, while its rolling 24-hour cooldown still applies. All other ravens return at their outward speed. No weather, fatigue or terrain modifiers apply initially. Arrival and return timestamps are fixed at dispatch.
 
 **MUST:** The Raven Rookery shows all five birds, individual status, next eligibility, and current mission where applicable. Bird choice at dispatch must not depend on frontend state alone.
 
@@ -43,18 +43,20 @@
 
 **MUST:** The editor should look like direct writing on parchment, not a boxed form. It must remain usable when Android's software keyboard is open; freehand mode must distinguish drawing from scrolling/zooming.
 
-**PROPOSED:** Typed letters max 10,000 Unicode characters; handwritten max 5 pages with bounded points/strokes and payload size. Confirm these limits before implementation. Draft autosave locally or server-side is desirable but not yet agreed.
+**MUST:** Typed letters are limited to 10,000 Unicode characters. Handwritten letters are limited to five pages, 200 strokes per page and 2,000 points per stroke. Canonical serialized content for any letter must not exceed 1 MiB. Coordinates and numeric stroke values must be finite and server-validated within approved bounds.
 
-**SHOULD:** Plain-text alternative/transcription for handwritten letters to improve accessibility; do not fabricate transcriptions automatically.
+**MUST:** Keep a local working draft and autosave it to the server. Drafts persist until successful dispatch or explicit deletion. Server saves use optimistic revision protection so stale writes cannot silently overwrite a newer draft; offline or conflicted local work must remain recoverable.
+
+**MUST:** A handwritten letter may include an optional author-provided plain-text transcription. Never fabricate or automatically generate a transcription.
 
 ## 5. Dispatch
 **MUST:** The composer recipient field is labelled `Address your letter to…` and accepts the recipient's Username. The sender composes the letter, chooses an eligible raven, and dispatches. Backend validates authenticated identity, recipient existence, blocked relationships, content limits, raven availability, recipient rules, and location availability. A raven is exclusively the carrier, never the recipient's identity.
 
-**MUST:** Dispatch is atomic: create letter/mission, snapshot sender/recipient city and seal design, reserve raven, and set timestamps together. Idempotency key prevents duplicate dispatch on retries. Do not consume a raven on failed dispatch.
+**MUST:** Dispatch is atomic through an authenticated endpoint invoking a transactional database function: create letter/mission, snapshot sender/recipient city and seal design, reserve raven, and set timestamps together. An identical retry with the same idempotency key replays the original result; conflicting reuse with a different request is rejected. Do not consume a raven on failed dispatch.
 
 **MUST:** A blocked sender cannot dispatch to that recipient. When a block occurs during flight, the letter must not be delivered to that recipient; use a privacy-preserving failure state and return the raven.
 
-**PROPOSED:** No recall after dispatch. Failure/return behavior for deleted recipient accounts or moderation sanctions must be specified before backend work.
+**MUST:** No recall after dispatch. If the recipient is deleted, suspended, banned or otherwise ineligible at arrival, suppress delivery, expose only a generic sender-visible failure and return the raven. Retain only the minimal account tombstone or immutable mission reference needed to complete active mission processing safely.
 
 ## 6. Journey calculation and tracking
 **MUST:** Sender-only access to active mission, raven position and ETA. Recipient must see no pending message, notification, count, flight marker or existence of letter until delivery.
@@ -63,10 +65,12 @@
 
 **SHOULD:** Great-circle distance from city centroids, with deterministic interpolated route points. Position is derived from immutable timestamps; no always-on simulation. On refresh, position is recomputed. Return leg is visible to sender as raven returning.
 
-**PROPOSED:** A minimal nonzero duration for non-instant local/city-to-same-city journeys to avoid zero-time travel. Decide exact minimum before implementation.
+**MUST:** Every non-instant outward and return leg lasts at least 10 minutes, including same-city and very short routes. Longer legs use trusted geographic distance and the selected raven speed.
 
 ## 7. Arrival and privacy
 **MUST:** No advance notice to recipient. Delivery occurs at scheduled arrival, not when sender clicks dispatch. Before arrival, recipient-side queries, counts, subscriptions, notifications, and API responses must reveal nothing.
+
+**MUST:** Store scheduled arrival/return timestamps separately from actual processing timestamps. Delivery and return processing use bounded retries and stuck-mission detection/recovery without duplicate delivery or stranded ravens.
 
 **MUST:** Letter is classified on arrival according to recipient rules, not by showing it early. Known contacts/friends may route to inbox; unknown senders may route to **Letter Requests**.
 
@@ -74,11 +78,11 @@
 
 **MUST:** No 'Nobody' setting. Blocking is available and overrides normal delivery.
 
-**PROPOSED privacy UI:** `Everyone`, `Contacts Only`, `Friends Only`. In Everyone, all nonblocked letters enter inbox; in Contacts Only, saved contacts enter inbox and others enter requests; in Friends Only, friends enter inbox and others enter requests. A separate `Message Requests` option was discussed but overlaps with Contacts Only; **do not implement a fourth mode without confirmation**.
+**MUST:** Incoming privacy modes are `Everyone`, `Contacts Only` and `Friends Only`. In Everyone, all nonblocked letters enter inbox; in Contacts Only, saved contacts enter inbox and others enter requests; in Friends Only, friends enter inbox and others enter requests. Do not implement a fourth mode.
 
 **MUST:** The sender can learn delivered/failed status, not read/open/delete/request status. No read receipts by default. A request is still 'delivered' from the sender's perspective.
 
-**PROPOSED:** When recipient changes privacy setting midflight, classify at arrival; if they block sender, suppress delivery. Exact handling of contact removal after arrival needs a rule.
+**MUST:** Classify at arrival using the recipient's current privacy mode and current contact/friend relationship. Recheck blocks and account eligibility in the same trusted transition. Later privacy or relationship changes do not automatically reclassify an already delivered letter.
 
 ## 8. Contacts, friends and blocks
 **MUST:** Contacts are unilateral saved accounts addressed by Username, with an optional private nickname; saving does not require approval and does not override the recipient's rules. Relationships continue to bind immutable account UUIDs internally.
@@ -89,6 +93,7 @@
 ## 9. Receiving and replying
 **MUST:** Delivered letters appear as sealed folded parchment with sender's signet. User opens a letter to read typed text or original handwritten strokes. Wax-breaking/unfolding animation is a visual enhancement, not a security mechanism.
 **MUST:** Letter Requests offer read, delete, block. Inbox allows read, delete and reply. Reply is a **new dispatch** requiring an eligible raven, not an instant chat response.
+**MUST:** The sender has an archive of sent letters, but it exposes only sender-owned content and privacy-safe delivery outcomes—never recipient inbox/request placement, opening, reading, deletion or other private activity.
 **PROPOSED:** 'Accept sender' could add contact, but must be explicit and separate from reading.
 
 ## 10. Signet system
@@ -137,14 +142,13 @@
 14. Phantom Raven is instant but cannot be reused within the daily cooldown.
 
 ## 15. Explicit open decisions
-- Typed character cap, handwriting page/point limits, and drafts.
-- Exact privacy labels and whether a fourth 'Requests' mode exists.
-- Minimum flight time for same-city dispatch.
-- Phantom Raven return behavior and whether users can name individual birds.
-- Account deletion, moderation retention and appeal policy.
+- Exact reserved-Username list and maintenance process.
+- Concrete licensed city dataset, geographic coverage and update cadence within the approved stable-ID/versioned-data contract.
+- Autosave debounce, retry/backoff and conflict-recovery presentation details.
+- Storage implementation for bounded handwriting content.
+- Optional “Accept sender” request action.
+- Account retention, anonymization, moderation retention and appeal policy beyond the approved minimal mission-safe tombstone behavior.
 - Notification service and whether email is opt-in.
-- User-facing delivery failures and whether sent letters can be archived.
-- City directory data source and update strategy.
-- Real-world clock behavior: fixed 24-hour rolling cooldown is recommended over local calendar days.
+- Worker cadence, batch size, retry thresholds and alerting within the approved bounded-retry/recovery contract.
 
 Record decisions here before implementing the affected module.

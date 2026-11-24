@@ -18,7 +18,7 @@ Statuses describe the current repository, not the importance of a feature. Each 
 |---|---|---|
 | Repository foundation and application shell | **Partial** | Astro, React, strict TypeScript, Tailwind, shared layout, responsive navigation, build/check scripts, Vitest and Playwright exist. Navigation has mobile/desktop E2E coverage. The workspace is the initialized Git repository at `/public/SendARaven`, on `main` with `origin/main` configured. There is no production SSR adapter, backend environment, CI/CD, staging setup, monitoring, or deployment runbook. |
 | Raven Rookery | **Partial** | `src/components/rookery/Rookery.tsx` presents five selectable ravens with responsive artwork and E2E coverage. Statuses, missions, and timers are fixtures; there is no authenticated inventory or server authority. Artwork and the rookery structure are not visually approved production assets. |
-| Letter composer and handwriting | **Partial** | `LetterComposer.tsx` and `src/lib/letters/editor.ts` provide local typed text, normalized vector strokes, pen, eraser, undo/redo, multipage state, serialization, and focused unit/E2E tests. No draft persistence, autosave decision, production limits, accessible handwriting transcription path, server validation, or Android real-device/IME approval exists. |
+| Letter composer and handwriting | **Partial** | `LetterComposer.tsx` and `src/lib/letters/editor.ts` provide local typed text, normalized vector strokes, pen, eraser, undo/redo, multipage state, serialization, and focused unit/E2E tests. Approved draft persistence, autosave, production-limit and optional transcription contracts are not implemented; server validation and Android real-device/IME approval are also absent. |
 | Authentication, Usernames, profiles and city | **Not Started** | No authentication provider integration, SSR sessions, onboarding, Username storage, profile persistence, city dataset, or geolocation flow exists. Settings is a placeholder. The current composer and Contacts placeholder still contain legacy `Raven ID` copy. |
 | Signet storage and upload processing | **Not Started** | No signet editor, immutable versions, safe image processing, storage authorization, or upload tests exist. Decorative seal-like UI does not count. |
 | Contacts, friendships, blocks and privacy | **Not Started** | The contacts route is placeholder content. No data model, authorization, privacy routing, request transitions, rate limits, or tests exist. |
@@ -137,24 +137,26 @@ Every phase must:
 
 **Dependencies:** Phase 0 interaction and accessibility conventions and the state/interaction rules in `docs/experience-design.md`. Phase 1 may proceed in parallel. Approved visual assets are required only before the affected composer or rookery production interface is finalized, not before local behavior, data-contract, validation, accessibility, or test work begins.
 
-**Decision gates before finalization:**
-- Exact typed-character, page, stroke, point and serialized-payload limits.
-- Draft persistence policy: local, server-side, or both; autosave timing; expiry and conflict behavior.
-- Accessible alternative/transcription workflow for handwritten letters.
-- Final initial raven allocation remains `PROPOSED`; do not assume every user starts with one of each until approved.
+**Approved contracts before finalization:**
+- Typed content: 10,000 Unicode characters; handwriting: five pages, 200 strokes per page and 2,000 points per stroke; 1 MiB canonical serialized content per letter.
+- Local working draft plus server autosave, persistent until successful dispatch or explicit deletion, with optimistic revision protection and recoverable offline/conflicted work.
+- Optional author-provided plain-text handwriting transcription; never fabricate transcription.
+- Exactly one raven of each approved type per account, with no custom names, acquisition or replacement initially.
+
+**Remaining technical details:** autosave debounce/retry behavior, conflict-recovery presentation and storage implementation for bounded handwriting content.
 
 **Tasks — Rookery interaction:**
 - Present up to five ravens with available, outbound, returning and resting states that do not rely only on colour.
 - Support keyboard, touch and screen-reader selection and a clear details view.
 - Separate fixture status demonstrations from future authenticated server state.
-- Define loading, empty, partial-inventory and unavailable states without inventing acquisition mechanics.
+- Define loading and unavailable states for the fixed five-raven inventory without inventing acquisition mechanics.
 
 **Tasks — Composer interaction:**
 - Preserve editable Unicode text, text selection, caret position, IME composition, readable-font accessibility view, and page navigation.
 - Preserve normalized ordered vector strokes across resizing; support finger, stylus and mouse, pressure where available, eraser, undo/redo and multipage composition.
 - Distinguish drawing from scrolling/zooming and keep controls usable while the Android keyboard is open.
-- Validate bounded local data once limits are approved; reject invalid numeric values and unsafe serialized documents.
-- Design draft recovery, stale/conflicting edits, offline behavior and explicit draft deletion only after the draft policy is approved.
+- Validate the approved content limits; reject invalid numeric values and unsafe serialized documents.
+- Implement the approved draft recovery, stale/conflicting edit protection, offline behavior and explicit deletion contract in the local design.
 - Keep attachments absent. A signet emblem is profile data, not letter content.
 
 **Required tests and review:**
@@ -167,7 +169,7 @@ Every phase must:
 **Completion gate:**
 - Local rookery and composer interactions satisfy mobile, accessibility and usability criteria; affected production visuals receive explicit approval before this phase is declared complete.
 - Data structures are documented and safe to persist, but no client state is described as dispatch authority.
-- Draft behavior and payload limits are approved before persistence implementation begins.
+- Approved draft behavior and payload limits are reflected consistently in persistence contracts.
 - Provisional artwork remains labeled and may continue improving alongside later engineering.
 
 ---
@@ -180,23 +182,23 @@ Every phase must:
 
 **Dependencies:** Phase 0 traceability and Git prerequisite; the schema-affecting decision gate below. Phase 3 may overlap with Phase 4 authentication contract work, but no production user data or authorization-dependent feature may be finalized before the relevant migrations, constraints and RLS policies pass review.
 
-**Pre-migration product decision gate:**
+**Approved pre-migration contracts:**
 
-Resolve these choices before creating the initial migrations for the affected tables, constraints, state machines or transactional functions:
-- Initial raven allocation, inventory creation and any rule about naming, acquisition or replacement that changes inventory cardinality or lifecycle.
-- Phantom Raven return semantics; outbound and return travel behavior for all raven types; and the same-city minimum delivery time.
-- Draft persistence location, autosave timing, expiry/recovery and conflict behavior.
-- Typed text, page, stroke, point and serialized-payload limits used by columns, constraints, validation and storage design.
-- Privacy-mode values if they are represented by a durable database enum.
-- Recall, deleted/sanctioned-recipient failure handling, or other unresolved choices that alter letter/mission states, timestamps, ownership, idempotency or rollback behavior.
+The Phase 3 schema may rely on the approved outcomes in DEC-P0-01 through DEC-P0-10: fixed five-raven provisioning; approved return and 10-minute minimum-leg rules; local-plus-server revisioned drafts; approved content limits; three privacy modes; no recall and privacy-safe ineligible-recipient failure; incremental schema with separated sender/recipient state; and endpoint-plus-transactional-function dispatch with strict idempotency semantics.
 
-Decisions may be deferred to later forward-only migrations when their tables and constraints are deliberately omitted from the initial schema and no existing state machine or API contract depends on them. Examples include notification provider fields, final map renderer details, final visual assets, moderation categories/retention fields, and operational settings introduced only with their later phase. Deferral must be recorded; placeholder columns or guessed enums must not be added merely to anticipate future work.
+**Initial migration boundary:**
+- Include profile/account-state ownership and Username constraints; city dataset versions and cities; immutable raven catalogue and transactionally provisioned inventory; signet versions; privacy settings; contacts, friend requests, friendships and blocks; and owner-scoped revisioned drafts.
+- Include all supporting constraints, indexes, canonical relationship keys, revision/update mechanics and deny-by-default RLS for those tables.
+- Add letters, recipient-private letter state, handwriting pages, missions, idempotency records and dispatch functions in a reviewed Phase 6 forward migration.
+- Add delivery/outbox tables in Phase 7, notification tables in Phase 10, and reports/moderation tables in Phase 11.
+
+Do not add placeholder columns or speculative transitions for later phases. Remaining technical choices such as exact SQL, reserved-name registry, autosave debounce, concrete licensed city source, storage placement and worker thresholds do not reopen the approved product contracts.
 
 **Tasks:**
-- Finalize the logical schema for profiles, cities, raven catalogue/inventory, signet versions, contacts, friendships, blocks, privacy, drafts, letters, handwriting pages, missions, delivery outbox, push subscriptions, reports, moderation actions and idempotency records as they become necessary.
+- Finalize and migrate the approved initial boundary; document later logical schemas without creating their tables before the relevant phase.
 - Document state machines and ownership of sender-visible versus recipient-private status. Do not expose request placement, opened, read or deleted state to senders.
 - Add forward-only migrations with constraints, indexes, canonical relationship keys, foreign-key behavior and deletion rules.
-- Enforce at database level where practical: approved immutable, case-insensitively unique Username rules, maximum five ravens, one active mission per raven, valid state transitions, unique UUID-based relationship pairs and immutable snapshots.
+- Enforce at database level where practical: approved immutable, case-insensitively unique Username rules, exactly one of each of the five raven types, unique UUID-based relationship pairs, approved privacy values and immutable snapshots. Add one-active-mission and dispatch-state constraints with the Phase 6 migration.
 - Implement deny-by-default RLS and storage policies by actor: visitor, owner/sender, recipient after delivery, unrelated user and restricted admin.
 - Design narrowly scoped security-definer functions with fixed `search_path`, explicit grants, validated caller identity and reviewed ownership.
 - Separate browser-safe configuration from service role, OAuth, push, worker and admin secrets.
@@ -225,7 +227,7 @@ Decisions may be deferred to later forward-only migrations when their tables and
 
 **Decision gates before durable implementation:**
 - Exact reserved-Username list and maintenance process must be documented before validation is finalized; the Username syntax, immutability and uniqueness rules are approved.
-- City dataset, licence, geographic coverage, update/version strategy and geolocation-to-city lookup.
+- Select the concrete licensed city source, geographic coverage and update cadence within the approved stable-ID/versioned-data/manual-search contract.
 - Signet fallback, long-inscription behavior, palette and final visual options.
 - City-change behavior for active missions must not mutate mission snapshots; any additional restrictions remain unresolved.
 
@@ -260,10 +262,9 @@ Decisions may be deferred to later forward-only migrations when their tables and
 
 **Dependencies:** Phase 4 authenticated profiles and Phase 3 authorization foundation.
 
-**Decision gates:**
-- Final privacy UI labels/enums. `Everyone`, `Contacts Only`, and `Friends Only` remain proposed UI; do not add a fourth mode or `Nobody`.
-- Contact-removal behavior for already delivered letters.
-- Optional “Accept sender” behavior remains proposed and must be explicit if approved.
+**Approved contract:** Privacy modes are `Everyone`, `Contacts Only` and `Friends Only`; there is no fourth mode or `Nobody`. Arrival uses current relationship/privacy state and delivered letters are not automatically reclassified later.
+
+**Remaining decision gate:** Optional “Accept sender” behavior remains proposed and must be explicit if approved.
 
 **Tasks:**
 - Implement unilateral contacts with optional private nickname.
@@ -292,32 +293,30 @@ Decisions may be deferred to later forward-only migrations when their tables and
 
 **Current status: Not Started**
 
-**Dependencies:** Phases 2–5 gates; approved payload limits and delivery-semantic decisions below.
+**Dependencies:** Phases 2–5 gates and the approved persistence, inventory, travel, failure and idempotency contracts.
 
-**Decision gates:**
-- Phantom Raven return behavior; its instant delivery and rolling 24-hour cooldown are approved, but exact return semantics remain proposed.
-- Non-instant return assumptions remain proposed.
-- Minimum nonzero same-city/non-instant duration.
-- Recall policy remains proposed.
-- Failure behavior for deleted recipients or moderation sanctions.
+**Approved contracts:** Phantom delivery/return are instantaneous; non-instant ravens return at outward speed; every non-instant leg is at least 10 minutes; no recall exists; ineligible recipients are suppressed with generic sender-visible failure and safe return; identical idempotent retries replay and conflicting key reuse is rejected.
+
+**Remaining technical details:** canonical request fingerprinting, exact SQL/isolation choices and Postgres JSON versus private object storage for bounded handwriting content.
 
 **Tasks — persistence and inventory:**
 - Persist typed text and bounded vector handwriting with server-side validation matching approved limits.
 - Persist approved drafts with conflict/recovery behavior from Phase 2.
-- Create authenticated raven inventory without assuming unapproved acquisition or starting-allocation mechanics.
+- Provision exactly one raven of each approved type transactionally and idempotently, with no naming, acquisition or replacement mechanics.
 - Show server-derived raven status, active mission and next eligibility in the rookery.
 
 **Tasks — dispatch transaction:**
 - Authenticate the sender and validate account standing, recipient, blocks, content, locations, approved privacy-related eligibility and selected raven.
 - Lock the raven row and reject if it has an active mission, has not returned, or is inside its rolling 24-hour dispatch window.
 - Compute trusted distance and timestamps on the server from versioned city centroids and immutable raven speed/type.
-- Atomically create the letter and mission, reserve the raven, record the idempotency key, and snapshot sender/recipient cities and signet version.
+- Through the authenticated endpoint and transactional database function, atomically create the letter and mission, reserve the raven, record the idempotency key plus request fingerprint, and snapshot sender/recipient cities and signet version.
 - Ensure failed dispatch consumes neither a raven nor a new letter/mission.
 - Return only sender-appropriate mission data and privacy-preserving errors.
 
 **Tasks — travel rules:**
 - Implement approved Haversine/great-circle distance and deterministic route-point calculations, including antimeridian behavior.
-- Store immutable `departed_at`, `arrival_at` and `return_at`; city/profile changes must not rewrite a mission.
+- Store immutable departure and scheduled arrival/return timestamps plus actual processing timestamps; city/profile/data updates must not rewrite a mission.
+- Apply a 10-minute minimum independently to every non-instant outward and return leg; Phantom is instantaneous in both directions.
 - Enforce five-raven maximum, one active mission per raven, return-before-reuse and one dispatch per rolling 24 hours using database constraints/locks, not disabled buttons.
 
 **Required tests and review:**
@@ -342,10 +341,9 @@ Decisions may be deferred to later forward-only migrations when their tables and
 
 **Dependencies:** Phase 6 dispatch and Phase 5 relationships/privacy.
 
-**Decision gates:**
-- Arrival classification when contact/friend state changes midflight, beyond the approved rule that blocks are rechecked.
-- Failure wording/status for deleted, banned or otherwise ineligible recipients.
-- Worker timing tolerance and late-processing presentation.
+**Approved contracts:** Arrival classification uses current privacy/relationship state; blocks and account eligibility are rechecked; ineligible delivery is suppressed with generic sender-visible failure and safe return; delivered letters are not automatically reclassified; scheduled and actual timestamps are separate; retries are bounded and stuck missions are recoverable.
+
+**Remaining technical details:** Worker cadence, batch size, retry thresholds, alerting and late-processing presentation.
 
 **Tasks — delivery processing:**
 - Build idempotent scheduled processing for outbound arrivals and returns in bounded batches.
@@ -366,7 +364,7 @@ Decisions may be deferred to later forward-only migrations when their tables and
 **Required tests and review:**
 - Two-worker contention and duplicate-delivery tests.
 - Integration tests: dispatch → arrival → inbox/request → return → cooldown.
-- Block-during-flight, privacy/relationship-change-during-flight, deleted/sanctioned-recipient and worker-outage recovery tests after decisions are approved.
+- Block-during-flight, privacy/relationship-change-during-flight, deleted/sanctioned-recipient and worker-outage recovery tests against the approved contracts.
 - Anti-leak tests through row access, joins, counts, errors, realtime, subscriptions, handwriting storage and cached responses.
 - Tests proving sender cannot infer request placement, read/open/delete state, contact state or privacy setting.
 - Recipient read/delete/block/reply E2E tests on mobile and desktop.
@@ -562,28 +560,23 @@ Decisions may be deferred to later forward-only migrations when their tables and
 
 ## 5. Open decisions and the phases they block
 
-The following remain unresolved unless `docs/product.md` is explicitly updated by an approved decision:
+The following product, technical or operational details remain open. Product-policy changes require `docs/product.md`; implementation choices belong in the appropriate architecture or phase documentation:
 
 | Decision | Blocks/finalizes |
 |---|---|
-| Initial raven allocation and inventory lifecycle rules | Phase 2 final rookery states; Phase 3 initial inventory schema; Phase 6 inventory creation |
-| Phantom return behavior and outbound/return travel assumptions | Phase 3 mission state/schema; Phase 6 timestamps/state transitions |
-| Same-city minimum travel duration | Phase 3 mission constraints if encoded there; Phase 6 travel calculation |
-| Typed/handwritten page, stroke, point and payload limits | Phase 2 validation; Phase 3 initial letter/handwriting schema; Phase 6 persistence |
-| Draft location, autosave, expiry, recovery and conflict policy | Phase 2 behavior; Phase 3 initial draft schema; Phase 6 persistence |
-| Handwriting transcription/accessibility workflow | Phases 2 and 7 |
-| Recall policy; deleted/sanctioned-recipient failure behavior | Phases 6, 7 and 11 |
-| Exact privacy UI modes/labels and contact-removal effects | Phases 5 and 7 |
+| Exact reserved-Username registry and maintenance process | Phase 4 validation finalization |
+| Autosave debounce/retry and conflict-recovery presentation | Phase 2/6 UX and implementation; does not block the revisioned draft schema |
+| Postgres JSON versus private object storage for bounded handwriting | Phase 6 persistence implementation |
 | Optional “Accept sender” action | Phase 7 |
-| City dataset, licence, coverage and geolocation lookup | Phases 4, 6 and 9 |
+| Concrete licensed city source, geographic coverage and update cadence | Phases 4, 6 and 9; stable IDs/versioning/manual search are approved |
 | Map renderer and asset pipeline | Phase 9 |
-| Worker timing tolerance and failure monitoring details | Phases 7 and 12 |
+| Worker cadence, batch size, retry thresholds, alerting and late-processing presentation | Phases 7 and 12; separate timestamps/bounded retry/recovery are approved |
 | Push implementation and optional email provider/cost | Phase 10 |
 | Final fonts, textures, raven art, signet palette, map style and animation sequences | Phases 1, 2, 8 and 9 |
 | Content rules, report categories, retention, deletion, appeals, legal notices and age policy | Phase 11 and launch |
 | Operational budgets, staging and monitoring choices | Phases 12 and 13 |
 
-Approved rules that must not be reopened accidentally include: immutable, case-insensitively unique 3–24 character Usernames with reserved-name protections and UUID-based relationships; ravens exclusively as carriers; up to five ravens; listed raven speeds; one dispatch per raven per rolling 24 hours and return-before-reuse; instant Phantom delivery; Contacts Only strangers arriving as requests; no `Nobody` privacy option; no advance recipient notice; sender-only tracking; no sender access to read/delete/request state; and signet uploads strictly under 50 KB.
+Approved rules that must not be reopened accidentally include: immutable, case-insensitively unique 3–24 character Usernames with reserved-name protections and UUID-based relationships; ravens exclusively as carriers; exactly one of each approved raven type per account with no names/acquisition/replacement initially; listed speeds; instantaneous Phantom delivery/return; outward-speed non-instant return; 10-minute minimum non-instant legs; rolling 24-hour cooldown plus return-before-reuse; local-plus-server revisioned drafts; approved content limits; `Everyone`, `Contacts Only` and `Friends Only`; no recall; arrival-time classification without automatic post-delivery reclassification; privacy-safe ineligible-recipient failure; no advance recipient notice; sender-only tracking/archive without recipient-private activity; separate sender/recipient states; strict dispatch idempotency; optional author transcription; versioned licensed city data with manual search; bounded worker retry/recovery; and signet uploads strictly under 50 KB.
 
 ## 6. Verified roadmap corrections and missing requirements
 
@@ -591,7 +584,7 @@ This revision corrects the prior roadmap by:
 
 - Replacing the obsolete “create a minimal scaffold” starting point with the verified partial frontend status.
 - Treating the rolling 24-hour dispatch rule as approved rather than awaiting wording confirmation.
-- Preventing proposed letter limits, privacy enums, draft semantics and lifecycle policies from becoming implementation assumptions.
+- Recording the now-approved letter limits, privacy modes, draft semantics and lifecycle policies as binding contracts while leaving only implementation details open.
 - Adding explicit database, migration, constraints, RLS, storage authorization and security-definer review before production data flows.
 - Adding transaction locking, idempotency conflicts, rollback behavior, two-worker contention, outage recovery and reconciliation requirements.
 - Expanding privacy tests beyond pre-arrival visibility to include sender status leakage, storage objects, joins, counts, errors, realtime and subscriptions.
@@ -606,14 +599,14 @@ The approved DEC-P1-08 terminology decision required coordinated updates to `vis
 
 ## 7. Recommended next development phase
 
-**Recommended next work: proceed with approved Phase 1/2 refinement in parallel with obtaining decisions for the Phase 3 schema gate. Do not create affected migrations until their P0 decisions are approved.**
+**Recommended next work: proceed with the approved Phase 3 initial migration boundary and its RLS/security review while continuing Phase 1/2 refinement in parallel.**
 
 Prerequisites before substantial backend implementation:
 
 1. Maintain `docs/requirements-matrix.md`, `docs/decision-register.md`, environment boundaries and the asset inventory as later work changes them.
-2. Resolve initial inventory, return/travel semantics, same-city timing, draft policy, content limits and other P0 schema decisions before creating their affected migrations.
+2. Finalize exact Phase 3 SQL, indexes, RLS policy text, security-definer ownership and isolated database environment. Finalize the reserved-name registry and concrete licensed city source before their Phase 4 implementation, not as blockers to the initial migration boundary.
 3. Establish database/auth contracts before protected flows are finalized.
 4. Observe the first hosted CI run after an authorized push and correct environment-specific failures if any.
 5. Continue visual refinement in parallel; unfinished visual approval alone does not block unrelated engineering.
 
-Phase 0 is **Complete** for its documentation and application-shell baseline. Real-device, screen-reader, production-asset and cross-browser checks remain explicit requirements of the affected later phases and launch readiness. Phase 3 migrations remain blocked by the P0 decisions in `docs/decision-register.md`.
+Phase 0 is **Complete** for its documentation and application-shell baseline. Real-device, screen-reader, production-asset and cross-browser checks remain explicit requirements of the affected later phases and launch readiness. The recorded P0 product contracts no longer block the approved Phase 3 initial migration boundary; only exact reviewed technical design remains before implementation.

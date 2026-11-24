@@ -56,4 +56,4 @@ These limitations remain required checks for the affected later UI phases and la
 
 ## Web interface guideline review
 
-Reviewed the application shell, navigation, rookery and composer against the current Web Interface Guidelines. Baseline issues fixed in this task are listed above. Remaining later-phase concerns include final screen-reader validation, destructive-action behavior when those features exist, unsaved-draft navigation warnings after draft policy approval, final colour/contrast review, and production asset licensing/approval.
+Reviewed the application shell, navigation, rookery and composer against the current Web Interface Guidelines. Baseline issues fixed in this task are listed above. Remaining later-phase concerns include final screen-reader validation, destructive-action behavior when those features exist, unsaved-draft navigation warnings for the approved local-plus-server draft model, final colour/contrast review, and production asset licensing/approval.

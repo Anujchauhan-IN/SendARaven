@@ -6,18 +6,20 @@
 
 ## Approved rules that are not open for reconsideration
 
-- Up to five ravens per user; the approved catalogue contains Phantom (instant), Swift (500 km/h), Courier (250 km/h), Wanderer (100 km/h) and Old (50 km/h).
+- Every account receives exactly one Phantom, Swift, Courier, Wanderer and Old raven; custom names, acquisition and replacement are not supported initially.
+- The approved catalogue speeds are Phantom (instant), Swift (500 km/h), Courier (250 km/h), Wanderer (100 km/h) and Old (50 km/h).
 - Each raven dispatches at most once per rolling 24 hours and cannot be reused until it returns. Server time and transactional locking are authoritative.
-- Phantom delivery is instant, while its exact return-state representation remains unresolved.
+- Phantom delivery and return are instantaneous. Non-instant ravens return at their outward speed. Every non-instant travel leg lasts at least 10 minutes.
 - Recipient must not know a letter exists before committed delivery.
 - Only the sender can track a mission in flight.
-- Contacts Only strangers still travel and arrive as Letter Requests.
-- There is no `Nobody` privacy option; blocking overrides normal delivery.
+- Incoming privacy modes are `Everyone`, `Contacts Only` and `Friends Only`; Contacts Only strangers still travel and arrive as Letter Requests.
+- Arrival classification uses current privacy and relationship state, with no automatic post-delivery reclassification. There is no `Nobody` privacy option; blocking overrides normal delivery.
 - Sender cannot learn request placement, read/open/delete state, or receive default read receipts.
 - Blocks bind immutable account UUIDs and are rechecked at arrival.
 - Letters have no attachments; signet emblems are separate profile assets.
 - Signet uploads are safe PNG/WebP, strictly under 50 KB, normalized server-side, and historically versioned.
-- Replies are new dispatches requiring an eligible raven.
+- Replies are new dispatches requiring an eligible raven; dispatched letters cannot be recalled.
+- Ineligible recipients cause suppressed delivery, a generic sender-visible failure and safe raven return.
 - Notifications occur only after delivery and failure cannot undo delivery.
 - Admin private-letter access is report-scoped, minimal and audited.
 - The human public identifier is Username. Usernames are immutable, case-insensitively unique, 3–24 lowercase Latin letters/digits/underscores, and protected by reserved-name rules.
@@ -29,66 +31,43 @@ A P0 decision may be deferred only if its affected tables, constraints and API/s
 
 ### DEC-P0-01 — Initial raven allocation and inventory lifecycle
 
-**Blocks:** Phase 2 final rookery states; Phase 3 inventory schema; Phase 6 inventory creation.  
-**Unresolved source:** `docs/product.md` §3/§15; `docs/roadmap.md` Phase 3 gate.
+**Status: APPROVED.**
 
-**Reasonable options:**
-- Give every new user one of each approved type, as currently proposed.
-- Approve another fixed initial allocation.
-- Create no automatic inventory until a separate allocation flow is approved.
-- Permit or omit individual raven names.
-- Define a fixed inventory with no acquisition/replacement, or reserve lifecycle support for a later approved feature.
+**Decision:** Every account receives exactly one Phantom, Swift, Courier, Wanderer and Old raven. Custom raven names, acquisition and replacement are not supported initially.
 
-**Technical implications:** `user_ravens` provisioning, maximum-five and per-type uniqueness constraints, empty/partial inventory states, naming columns, replacement/deactivation history, signup transaction, RLS and seed data.
+**Technical implications:** Seed the immutable five-type catalogue and create the five `user_ravens` rows transactionally and idempotently during account provisioning. Enforce one raven per owner/type and at most five per owner. Do not add naming, acquisition, replacement or lifecycle-history columns before a later approved feature requires them.
 
 ### DEC-P0-02 — Phantom and non-instant return semantics
 
-**Blocks:** Phase 3 mission state/schema; Phase 6 timestamps and cooldown; Phase 7 worker transitions; Phase 9 return tracking.
+**Status: APPROVED.**
 
-**Reasonable options:**
-- Phantom delivery and return are both instantaneous while cooldown remains active.
-- Phantom delivery is instantaneous but return is represented as a distinct transition.
-- Non-instant ravens return at outward speed, as proposed.
-- Approve another deterministic return model; weather/fatigue modifiers are not currently approved.
+**Decision:** Phantom delivery and return are instantaneous while its rolling 24-hour cooldown remains active. Every non-instant raven returns at its outward speed. Weather, fatigue and terrain modifiers are not part of the initial model.
 
-**Technical implications:** mission states, `arrival_at`/`return_at` nullability and ordering, worker jobs, `returning`/`resting` presentation, cooldown independence, sender tracking and integration tests.
+**Technical implications:** Phantom may commit dispatch, delivery and return in one transaction while remaining cooldown-ineligible. Non-instant missions persist outward and return timestamps fixed at dispatch. Eligibility requires both committed return and cooldown expiry.
 
 ### DEC-P0-03 — Same-city minimum delivery duration
 
-**Blocks:** Phase 3 timestamp/state constraints if encoded initially; Phase 6 travel calculation.
+**Status: APPROVED.**
 
-**Reasonable options:**
-- Use an approved fixed nonzero minimum for non-instant ravens.
-- Permit distance-derived zero/near-zero duration.
-- Use another deterministic minimum rule.
+**Decision:** Every non-instant outward or return leg has a minimum duration of 10 minutes, including same-city and very short routes. Phantom remains instantaneous.
 
-**Technical implications:** arrival/return timestamp constraints, worker scheduling, local-route UX, cooldown tests, map interpolation and privacy timing.
+**Technical implications:** Compute each non-instant leg as `max(10 minutes, distance / speed)` using trusted server inputs and deterministic rounding. Apply the minimum independently to outward and return legs.
 
 ### DEC-P0-04 — Draft persistence, autosave and conflict behavior
 
-**Blocks:** Phase 2 final draft behavior; Phase 3 draft schema; Phase 6 persistence.
+**Status: APPROVED.**
 
-**Reasonable options:**
-- Local-only drafts.
-- Server-only drafts.
-- Local plus server synchronization.
-- Explicit save or autosave with an approved interval.
-- Persistent or expiring drafts.
-- Last-write-wins, optimistic revision conflict, or explicit conflict recovery.
+**Decision:** The editor keeps a local working draft and autosaves to the server. Drafts persist until successful dispatch or explicit deletion. Server saves use optimistic revision protection; stale writes must not silently overwrite a newer revision.
 
-**Technical implications:** whether a `drafts` table exists initially, revision columns, ownership RLS, private handwriting storage, offline synchronization, cleanup jobs, stale-write behavior and draft-to-dispatch transaction.
+**Technical implications:** Include owner-scoped draft persistence with a monotonic revision, schema version and updated timestamp. Keep local recovery data when offline or conflicted. Exact debounce timing, retry backoff and conflict-resolution presentation are technical details, not product blockers.
 
 ### DEC-P0-05 — Typed and handwritten content limits
 
-**Blocks:** Phase 2 validation; Phase 3 letter/handwriting schema; Phase 6 persistence.
+**Status: APPROVED.**
 
-**Reasonable options:**
-- Approve the proposed 10,000 Unicode-character maximum or another bounded cap.
-- Approve the proposed five-page maximum or another bounded cap.
-- Set explicit stroke, point, coordinate, serialized-payload and request-size limits.
-- Store bounded vector JSON in Postgres or private object storage.
+**Decision:** Typed content is limited to 10,000 Unicode characters. A handwritten letter is limited to five pages, 200 strokes per page and 2,000 points per stroke. Canonical serialized content for any letter is limited to 1 MiB.
 
-**Technical implications:** column/storage types, check constraints, request and transaction size, resource exhaustion controls, rendering performance, worker throughput and boundary/malicious-payload tests.
+**Technical implications:** Count typed characters deterministically as Unicode scalar values across client and server. Require finite normalized coordinates and bounded tool values. Enforce the 1 MiB limit on canonical serialized content, with a separately bounded transport envelope. Postgres JSON versus private object storage remains an implementation choice subject to the same ACL and limits.
 
 ### DEC-P0-06 — Username syntax, mutability and reserved names
 
@@ -100,94 +79,77 @@ A P0 decision may be deferred only if its affected tables, constraints and API/s
 
 ### DEC-P0-07 — Durable privacy-mode representation
 
-**Blocks:** Phase 3 only if a constrained value is introduced; Phase 5 settings; Phase 7 classification.
+**Status: APPROVED.**
 
-**Reasonable options:**
-- Approve the proposed `Everyone`, `Contacts Only`, `Friends Only` semantics.
-- Use text/check or a lookup table instead of a PostgreSQL enum until values stabilize.
-- Omit durable privacy settings from the initial schema until approved.
-- A fourth requests mode requires explicit approval; `Nobody` remains forbidden.
+**Decision:** The incoming privacy modes are `Everyone`, `Contacts Only` and `Friends Only`. There is no `Nobody` mode and no fourth requests mode. Store stable semantic keys separately from localizable UI labels.
 
-**Technical implications:** enum migration difficulty, defaults, arrival worker queries, relationship joins, RLS, in-flight changes and tests. UI labels may change without changing stored semantic keys if designed separately.
+**Technical implications:** A constrained text value or lookup table may represent `everyone`, `contacts_only` and `friends_only`; a PostgreSQL enum is not required. Arrival classification joins current privacy and relationship state transactionally.
 
 ### DEC-P0-08 — Recall and recipient-ineligibility failure behavior
 
-**Blocks:** Phase 3 letter/mission states and foreign-key behavior; Phases 6, 7 and 11.
+**Status: APPROVED.**
 
-**Reasonable options:**
-- Approve proposed no-recall behavior.
-- Permit recall with a defined cutoff and return transition.
-- Treat deleted/suspended/banned recipient as privacy-preserving undeliverable.
-- Retain a tombstone identity sufficient to complete active missions.
-- Define archive/removal behavior separately from sender-visible status.
+**Decision:** A dispatched letter cannot be recalled. If the recipient is deleted, suspended, banned or otherwise ineligible at arrival, suppress delivery, expose only a generic sender-visible failure and return the raven safely. Retain only the minimal account tombstone or immutable mission references needed to preserve mission integrity and privacy.
 
-**Technical implications:** letter/mission status values, foreign-key deletion actions, tombstones/anonymization, dispatch/arrival checks, sender-visible failure, return scheduling, retries, retention and moderation.
+**Technical implications:** No recall transition is present. Account lifecycle and foreign-key behavior must preserve active mission processing without retaining unnecessary profile data. Broader retention, anonymization and appeals policy remains under DEC-P2-03.
 
 ### DEC-P0-09 — Initial schema boundaries and status ownership
 
-**Blocks:** Phase 3 and every persisted backend phase.
+**Status: APPROVED.**
 
-**Reasonable options:**
-- Add tables incrementally by phase rather than creating the entire proposed logical model initially.
-- Separate sender-visible delivery state from recipient-private placement/open/delete state in separate tables/views, or use another reviewed structure with equivalent anti-leak guarantees.
-- Derive mission states primarily from immutable timestamps, or persist constrained explicit states where workers require transitions.
-- Define which transitions are performed only through security-definer functions.
+**Decision:** Build the schema incrementally. Keep sender-visible delivery outcomes separate from recipient-private inbox/request placement, open/read and deletion state. Sensitive lifecycle transitions occur only through reviewed transactional functions; timestamps remain immutable snapshots while explicit constrained states are used where workers require committed transitions.
 
-**Technical implications:** migration scope, RLS complexity, joins/counts/realtime leakage, state-transition constraints, query plans, admin report access, deletion behavior and long-term compatibility.
+**Technical implications:** The initial migration contains only approved foundational domains. Later feature migrations add dispatch, delivery, notifications and moderation tables when their implementation begins. RLS, views, counts, joins and realtime publication must preserve the state separation.
 
 ### DEC-P0-10 — Atomic dispatch and idempotency contract
 
-**Blocks:** Phase 3 RPC/security design; Phase 6 dispatch.
+**Status: APPROVED.**
 
-**Reasonable options:**
-- A narrow security-definer database RPC owns the full transaction.
-- A server endpoint invokes an equivalently reviewed transactional database function.
-- Persist idempotency keys and return the original successful result on retry.
-- Define conflicting payload reuse as a conflict or another privacy-safe rejection.
+**Decision:** An authenticated server endpoint invokes a narrow transactional database function for dispatch. An identical retry with the same idempotency key replays the original result; reuse of that key with a different canonical request is rejected as a privacy-safe conflict.
 
-**Technical implications:** row locking, isolation level, one-active-mission constraint, validation ordering, snapshot writes, fixed `search_path`, explicit grants, retry semantics and rollback guarantees.
+**Technical implications:** Persist an idempotency key, canonical request fingerprint and result reference in the dispatch transaction. Lock the selected raven, enforce one active mission, use fixed `search_path` and explicit grants, and roll back every dispatch write on failure.
 
 ## P1 — Resolve before later core feature finalization
 
 ### DEC-P1-01 — City dataset, licence and update strategy
 
-**Blocks:** Phases 4, 6 and 9.
+**Status: APPROVED.**
 
-**Reasonable options:** versioned curated city dataset with approved geographic coverage; manual search only or optional coordinate-to-city lookup; chosen source/licence and update cadence.
+**Decision:** Use licensed, versioned city data with stable city IDs and centroids. Initial onboarding uses manual city search. Optional permission-based coordinate lookup may be added later without retaining raw coordinates.
 
-**Technical implications:** stable city IDs, source versions, ambiguous names, centroid precision, seed/update process, geolocation disposal, mission snapshots and map compatibility. A generic city contract may be designed before production data is selected.
+**Technical implications:** Record dataset source/version, validate ambiguous names and coordinate bounds, and snapshot mission geography so later dataset updates cannot rewrite journeys. Selecting the concrete licensed dataset and update cadence remains an implementation procurement task.
 
 ### DEC-P1-02 — Arrival classification under relationship/privacy changes
 
-**Blocks:** Phases 5 and 7.
+**Status: APPROVED.**
 
-**Reasonable options:** classify using arrival-time contact/friend/privacy state, as proposed; define handling for contact/friend removal and privacy changes after dispatch or after delivery. Blocks must still be rechecked and override delivery.
+**Decision:** Classify a deliverable letter at arrival using the recipient's current privacy mode and current contact/friend relationship. Recheck blocks and eligibility in the same transaction. Once delivered, later relationship or privacy changes do not automatically reclassify it.
 
-**Technical implications:** worker transaction consistency, concurrent relationship changes, historical placement, inbox/request transitions and anti-leak tests.
+**Technical implications:** Arrival processing needs a transactionally consistent relationship/privacy snapshot and immutable initial placement. Recipient actions may change private presentation state without changing sender-visible delivery outcome.
 
 ### DEC-P1-03 — Handwriting accessibility alternative
 
-**Blocks:** Phase 2 final accessibility design; Phase 7 reading; Phase 3 only if persisted initially.
+**Status: APPROVED.**
 
-**Reasonable options:** optional author-supplied transcription; another author-provided readable alternative; defer fields until workflow approval. Automatic fabricated transcription is not allowed.
+**Decision:** Authors may optionally provide a plain-text transcription for a handwritten letter. Automatic or fabricated transcription is not allowed.
 
-**Technical implications:** editor UX, related columns/table, ownership RLS, recipient access, validation and accessibility tests.
+**Technical implications:** Store the optional transcription with the letter content under the same ownership and delivery ACL, validate it as plain text, and expose it only with the authorized letter.
 
 ### DEC-P1-04 — User-facing failure and sent-letter archive behavior
 
-**Blocks:** Phases 6 and 7.
+**Status: APPROVED.**
 
-**Reasonable options:** generic delivered/failed status only; define whether failed/sent letters remain in a sender archive; decide which failure details remain private.
+**Decision:** Provide a sender archive for sent letters. Sender-visible status is limited to privacy-safe delivery outcomes and must never disclose inbox/request placement, reading, opening, deletion or other recipient-private activity.
 
-**Technical implications:** sender-visible status model, retention, queries, failure copy, storage lifecycle and leakage tests.
+**Technical implications:** Archive queries use sender-owned immutable content and sender-visible status only. Generic failure behavior follows DEC-P0-08; retention duration remains part of later policy work.
 
 ### DEC-P1-05 — Worker schedule, timing tolerance and late processing
 
-**Blocks:** Phases 7 and 12.
+**Status: APPROVED.**
 
-**Reasonable options:** different bounded cron frequencies and lateness tolerances; explicit delayed presentation or no special user-visible state; chosen retry/dead-letter thresholds.
+**Decision:** Persist scheduled timestamps separately from actual processing timestamps. Delivery/return processing uses bounded retries and includes stuck-mission detection and recovery.
 
-**Technical implications:** scheduled versus actual timestamps, batch size, `SKIP LOCKED` claims, retry limits, stuck-mission reconciliation, metrics, alerts and cost.
+**Technical implications:** Workers claim bounded batches transactionally, record attempts and actual transition times, and support reconciliation without duplicate delivery. Exact cadence, batch size, retry count and alert thresholds are operational details for Phases 7 and 12.
 
 ### DEC-P1-06 — Optional “Accept sender” action
 

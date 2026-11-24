@@ -78,7 +78,7 @@ The required user-visible lifecycle conditions map to presentation as follows; e
 | Returned but within rolling cooldown | Raven present and resting | Exact next eligibility based on trusted server time |
 | Unavailable/error | Perch and status remain visible without inventing a cause | Explain whether data could not load or the raven is ineligible |
 
-The interface must support empty or partial inventory until initial allocation is approved. It must not invent raven acquisition, breeding, replacement or naming mechanics.
+The interface presents the fixed five-raven inventory: exactly one Phantom, Swift, Courier, Wanderer and Old raven. It must not invent raven acquisition, breeding, replacement or naming mechanics.
 
 Selection uses a clear pressed/selected state, text and focus—not colour or animation alone. On mobile, a single strong raven view with adjacent perch navigation may be preferable to shrinking five birds into illegibility.
 
@@ -103,7 +103,7 @@ The writing chamber is quiet and task-focused. The parchment is the actual editi
 - Original vector strokes remain the source; raster previews are not the sole stored letter.
 - Any accessible transcription is author-provided. Automatic fabricated transcription is forbidden.
 
-Draft-save state is communicated plainly (`Saving`, `Saved`, `Offline`, `Conflict needs review`) only after the draft policy is approved and implemented. A decorative quill movement must never imply persistence.
+Draft-save state is communicated plainly (`Saving`, `Saved`, `Offline`, `Conflict needs review`) for the approved local-working-copy plus server-autosave model. Optimistic conflicts and offline work must remain recoverable; a decorative quill movement must never imply persistence.
 
 ### 3.3 Letter folding and wax sealing
 
@@ -144,7 +144,7 @@ The chart table is a sender-only view of a real journey. It combines verifiable 
 - A textual status gives departure, destination, scheduled arrival/return and current phase without requiring map vision.
 - Recipient and unrelated users receive no map, ETA, marker or mission-existence signal.
 
-Late worker processing must not be disguised by fake arrival motion. The display distinguishes a scheduled estimate from committed delivery where necessary, according to the eventual approved timing policy.
+Late worker processing must not be disguised by fake arrival motion. The display distinguishes scheduled estimates from actual committed delivery/return processing, while bounded retries and stuck-mission recovery remain security-neutral.
 
 ### 3.6 Receiving, opening and reading letters
 
@@ -304,7 +304,7 @@ Approved and retained interface language:
 3. Verification and callback states explain progress and recovery plainly.
 4. User chooses an immutable Username and city; an optional display name may be offered but is not required. City-level route visibility is explained.
 5. User creates or confirms a signet using readable identity text and safe imagery.
-6. User enters the rookery and receives a clear explanation of raven availability without assuming unresolved initial allocation rules.
+6. User enters the rookery and receives a clear explanation of the fixed five-raven inventory, current availability and next eligibility.
 
 ### 6.2 Writing and dispatching correspondence
 
@@ -322,7 +322,7 @@ Approved and retained interface language:
 2. Refresh, reconnect and device changes reconstruct the same journey rather than restarting animation.
 3. Recipient sees nothing before committed delivery.
 4. After outward arrival commits, the sender sees only an allowed delivered/failed outcome; request placement remains private.
-5. The raven begins or completes its return according to the eventually approved return semantics.
+5. Phantom return commits instantaneously; a non-instant raven begins its return at the outward speed.
 6. After return, the rookery still enforces the independent rolling 24-hour eligibility rule.
 
 ### 6.4 Discovering and reading correspondence
@@ -434,15 +434,18 @@ No screen, term, production asset or animation is approved merely because it app
 - `Username` replaces `Raven ID` in product language and future contracts. Existing application placeholder copy still requires a later implementation change; this documentation update does not implement it.
 - A raven remains exclusively the carrier. Relationships remain bound to immutable account UUIDs.
 
-### Product decisions that continue to constrain experience design
+### Approved product contracts that constrain experience design
 
-- Initial raven allocation, individual naming and inventory lifecycle.
-- Phantom and non-instant return semantics; same-city minimum travel duration.
-- Draft persistence, autosave, expiry and conflict recovery.
-- Typed and handwritten content limits and handwriting accessibility workflow.
-- Exact privacy modes/labels and relationship changes during flight or after delivery.
-- Recall and recipient-ineligibility failure behaviour.
-- Sent archive and user-facing failure detail.
+- Exactly one of each approved raven type; no individual naming, acquisition or replacement initially.
+- Instant Phantom delivery/return, outward-speed non-instant return, rolling cooldown plus completed return, and a 10-minute minimum per non-instant leg.
+- Local working draft plus server autosave, persistence until dispatch/deletion and optimistic conflict recovery.
+- Approved typed, page, stroke, point and 1 MiB serialized-content limits; optional author-provided handwriting transcription.
+- `Everyone`, `Contacts Only` and `Friends Only`; arrival-time classification using current state; no automatic post-delivery reclassification.
+- No recall; privacy-safe suppressed delivery for ineligible recipients; sender archive without recipient-private activity disclosure.
+- Scheduled versus actual processing timestamps, bounded retries and stuck-mission recovery.
+
+### Remaining product decision
+
 - Optional `Accept sender` action.
 
 ### Visual and interaction decisions still requiring approval
