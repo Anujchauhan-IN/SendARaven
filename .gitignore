@@ -14,5 +14,9 @@ playwright-report/
 *.pem
 *.key
 
+# Supabase CLI local state
+supabase/.temp/
+supabase/.branches/
+
 # Test coverage
 coverage/

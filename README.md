@@ -13,7 +13,8 @@ A medieval-inspired, real user-to-user correspondence application built around h
 3. [`docs/design.md`](docs/design.md) — visual direction and review criteria
 4. [`docs/architecture.md`](docs/architecture.md) — proposed technical approach
 5. [`docs/roadmap.md`](docs/roadmap.md) — phased plan and acceptance gates
-6. [`AGENTS.md`](AGENTS.md) — Codex operating instructions
+6. [`docs/database-workflow.md`](docs/database-workflow.md) — migration CI, hosted deployment setup and recovery
+7. [`AGENTS.md`](AGENTS.md) — Codex operating instructions
 
 ## Reference prototype
 Open `reference-prototype/index.html` in a static file preview, or from the `reference-prototype` directory run:
@@ -34,7 +35,7 @@ npm run build
 npm run test:e2e
 ```
 
-The frontend foundation uses Astro, React islands, strict TypeScript and Tailwind CSS v4. Supabase, authentication, persistence, dispatch and scheduled delivery remain future-phase work and are not installed or implemented.
+The frontend foundation uses Astro, React islands, strict TypeScript and Tailwind CSS v4. Phase 3A includes Git-tracked Supabase migrations and database tests, verified through GitHub Actions; authentication UI, persistence flows, dispatch and scheduled delivery are not implemented.
 
 ## Starting with Codex
 Open this directory in your editor and ask Codex to read `AGENTS.md` and `docs/*.md`, inspect the reference prototype, and report its understanding **without coding**. Resolve important open decisions and approve the first visual screen before implementation.
