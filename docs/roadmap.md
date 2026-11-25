@@ -176,9 +176,15 @@ Every phase must:
 
 ### Phase 3 — Database, migrations, RLS and server security foundation
 
-**Current status: Not Started**
+**Current status: Partial**
 
 **Purpose:** Establish data ownership and authorization before authentication-dependent product features are built.
+
+**Verified Phase 3A progress:**
+- Added the first versioned Supabase migration for Auth-linked profiles, private account standing, immutable normalized Usernames, reserved names, versioned city data and the immutable five-type raven catalogue.
+- Added deny-by-default RLS, explicit grants, restricted security-definer profile provisioning and protections against profile identity, standing and catalogue mutation.
+- Added 61 focused pgTAP assertions covering constraints, catalogue integrity, anonymous denial, cross-account isolation, unauthorized writes and privilege boundaries.
+- Database execution remains unverified locally because this Android environment has no Supabase CLI, PostgreSQL client/server, pgTAP runner or Docker/Podman runtime. No remote Supabase project was provisioned or modified.
 
 **Dependencies:** Phase 0 traceability and Git prerequisite; the schema-affecting decision gate below. Phase 3 may overlap with Phase 4 authentication contract work, but no production user data or authorization-dependent feature may be finalized before the relevant migrations, constraints and RLS policies pass review.
 
